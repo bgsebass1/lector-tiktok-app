@@ -1,0 +1,19 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno (¡nunca subir claves!)
+.env
+
+# Bases de datos locales (incluye archivos auxiliares WAL de SQLite)
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+
+# Builds
+dist/
+build/
+
+# Sistema operativo / editor
+.DS_Store
+.vscode/

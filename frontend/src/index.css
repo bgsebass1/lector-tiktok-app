@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilos base de la aplicación: estética dark editorial. */
+@layer base {
+  body {
+    @apply bg-carbon text-cream font-sans antialiased;
+    /* Textura sutil de "grano" para que el dark no se sienta plano (mejora 2).
+       Es un patrón SVG de ruido muy tenue superpuesto al fondo carbón. */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    background-attachment: fixed;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
+  }
+
+  /* Fechas, contadores y stats en monoespaciada. */
+  .stat,
+  time,
+  kbd {
+    @apply font-mono;
+  }
+}
+
+@layer components {
+  /* Tarjeta genérica con borde sutil. */
+  .card {
+    @apply bg-surface border border-border rounded-xl;
+  }
+
+  /* Botón dorado principal. */
+  .btn-gold {
+    @apply bg-gold text-carbon font-medium px-5 py-2.5 rounded-lg
+           transition hover:brightness-110 disabled:opacity-50
+           disabled:cursor-not-allowed;
+  }
+
+  /* Botón secundario (borde). */
+  .btn-ghost {
+    @apply border border-border text-cream px-5 py-2.5 rounded-lg
+           transition hover:border-gold hover:text-gold;
+  }
+
+  /* Campo de texto. */
+  .input {
+    @apply w-full bg-carbon border border-border rounded-lg px-4 py-2.5
+           text-cream placeholder:text-muted
+           focus:outline-none focus:border-gold transition;
+  }
+}
+
+/* Scrollbar discreta acorde al tema oscuro. */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a3a;
+}
