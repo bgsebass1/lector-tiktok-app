@@ -1,62 +1,43 @@
 /**
- * Rutas de BACKUP / RESTORE (mejora transversal 6).
+ * Rutas de BACKUP / RESTORE / EXPORT / IMPORT.
  *
- *  GET  /api/backup   -> descarga toda la BD como un JSON
- *  POST /api/restore  -> restaura desde un JSON (reemplaza el contenido)
+ *  GET  /api/backup      -> descarga toda la BD como JSON
+ *  POST /api/restore     -> restaura desde un JSON (reemplaza el contenido)
+ *  GET  /api/export-all  -> alias de /backup (export completo descargable)
+ *  POST /api/import-all  -> alias de /restore
+ *
+ * Las tablas se descubren dinámicamente desde sqlite_master, así que cualquier
+ * tabla nueva (sesiones, highlights, flashcards, etc.) entra automáticamente.
  */
 import { Router, type Request, type Response } from "express";
 import { db } from "../db.js";
 
 export const backupRouter = Router();
 
-// Tablas que entran en el backup.
-const TABLES = [
-  "books",
-  "ideas",
-  "book_recommendations",
-  "scripts",
-  "script_versions",
-  "quotes",
-  "words",
-  "content_pipeline",
-  "series",
-  "series_episodes",
-  "inspiration",
-];
+/** Lista todas las tablas de usuario (excluye internas de SQLite). */
+function allTables(): string[] {
+  return db
+    .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
+    .all()
+    .map((r) => (r as { name: string }).name);
+}
 
-/** GET /api/backup — exporta todo como JSON descargable. */
-backupRouter.get("/backup", (_req, res) => {
-  const dump: Record<string, unknown[]> = {};
-  for (const table of TABLES) {
-    dump[table] = db.prepare(`SELECT * FROM ${table}`).all();
+/** Vuelca toda la BD a un objeto serializable. */
+function dumpAll() {
+  const data: Record<string, unknown[]> = {};
+  for (const table of allTables()) {
+    data[table] = db.prepare(`SELECT * FROM ${table}`).all();
   }
+  return { exported_at: new Date().toISOString(), app: "pliego", version: 2, data };
+}
 
-  const payload = {
-    exported_at: new Date().toISOString(),
-    version: 1,
-    data: dump,
-  };
-
-  const filename = `backup-libros-${new Date().toISOString().slice(0, 10)}.json`;
-  res.setHeader("Content-Type", "application/json");
-  res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
-  res.send(JSON.stringify(payload, null, 2));
-});
-
-/** POST /api/restore — restaura desde un JSON exportado. */
-backupRouter.post("/restore", (req: Request, res: Response) => {
-  const data = req.body?.data as Record<string, Array<Record<string, unknown>>> | undefined;
-  if (!data || typeof data !== "object") {
-    return res.status(400).json({ error: "JSON de backup inválido (falta 'data')." });
-  }
-
-  // Todo dentro de una transacción: si algo falla, no queda a medias.
-  const restore = db.transaction(() => {
+/** Restaura la BD desde un volcado (transaccional). */
+function restoreAll(data: Record<string, Array<Record<string, unknown>>>) {
+  const tables = new Set(allTables());
+  const run = db.transaction(() => {
     db.pragma("foreign_keys = OFF");
-    for (const table of TABLES) {
-      const rows = data[table];
-      if (!Array.isArray(rows)) continue;
-
+    for (const [table, rows] of Object.entries(data)) {
+      if (!tables.has(table) || !Array.isArray(rows)) continue;
       db.prepare(`DELETE FROM ${table}`).run();
       for (const row of rows) {
         const cols = Object.keys(row);
@@ -69,12 +50,33 @@ backupRouter.post("/restore", (req: Request, res: Response) => {
     }
     db.pragma("foreign_keys = ON");
   });
+  run();
+}
 
+/** Handler compartido para descargar el export. */
+function sendExport(res: Response) {
+  const filename = `pliego-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  res.setHeader("Content-Type", "application/json");
+  res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+  res.send(JSON.stringify(dumpAll(), null, 2));
+}
+
+/** Handler compartido para importar/restaurar. */
+function handleImport(req: Request, res: Response) {
+  const data = req.body?.data as Record<string, Array<Record<string, unknown>>> | undefined;
+  if (!data || typeof data !== "object") {
+    return res.status(400).json({ error: "JSON inválido (falta 'data')." });
+  }
   try {
-    restore();
+    restoreAll(data);
     return res.json({ ok: true });
   } catch (err) {
-    console.error("Error restaurando backup:", err);
-    return res.status(500).json({ error: "No se pudo restaurar el backup." });
+    console.error("Error restaurando:", err);
+    return res.status(500).json({ error: "No se pudo restaurar." });
   }
-});
+}
+
+backupRouter.get("/backup", (_req, res) => sendExport(res));
+backupRouter.get("/export-all", (_req, res) => sendExport(res));
+backupRouter.post("/restore", handleImport);
+backupRouter.post("/import-all", handleImport);

@@ -4,25 +4,77 @@
  * better-sqlite3 es síncrono: cada consulta devuelve el resultado directamente,
  * sin promesas ni callbacks. Es perfecto para una app local de un solo usuario.
  *
- * El archivo de la base de datos ("lector.db") se crea automáticamente en la
- * carpeta /backend la primera vez que arranca el servidor.
+ * PERSISTENCIA SEGURA (A2): la base de datos vive en ~/.pliego/data.db, FUERA de
+ * la carpeta del proyecto, para que sobreviva a borrados/reinstalaciones del repo.
+ * Al arrancar:
+ *   - Si existe la BD antigua del proyecto (backend/lector.db) y aún no hay
+ *     data.db, se migra automáticamente (copia consistente vía VACUUM INTO).
+ *   - Se crea un backup diario en ~/.pliego/backups/ y se conservan los 30 más
+ *     recientes.
  */
 import Database from "better-sqlite3";
-import { fileURLToPath } from "node:url";
+import { homedir } from "node:os";
 import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { existsSync, mkdirSync, readdirSync, statSync, rmSync } from "node:fs";
 
-// Como usamos ESM, reconstruimos __dirname manualmente.
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// El .db queda en la raíz de /backend (un nivel arriba de /src).
-const dbPath = join(__dirname, "..", "lector.db");
+/** Carpeta de datos persistente del usuario. */
+export const DATA_DIR = join(homedir(), ".pliego");
+export const BACKUPS_DIR = join(DATA_DIR, "backups");
+const DB_PATH = join(DATA_DIR, "data.db");
 
-// Abrimos (o creamos) la base de datos.
-export const db = new Database(dbPath);
+/** Ruta antigua dentro del proyecto (para migrar una sola vez). */
+const LEGACY_DB = join(__dirname, "..", "lector.db");
+
+/** Escapa una ruta para usarla dentro de una sentencia SQL ('...'). */
+const sqlPath = (p: string) => p.replace(/\\/g, "/").replace(/'/g, "''");
+
+mkdirSync(DATA_DIR, { recursive: true });
+mkdirSync(BACKUPS_DIR, { recursive: true });
+
+// Migración única: BD antigua del proyecto -> ~/.pliego/data.db
+if (!existsSync(DB_PATH) && existsSync(LEGACY_DB)) {
+  try {
+    const legacy = new Database(LEGACY_DB);
+    legacy.exec(`VACUUM INTO '${sqlPath(DB_PATH)}'`);
+    legacy.close();
+    console.log("📦 Migrada la BD antigua (lector.db) → ~/.pliego/data.db");
+  } catch (e) {
+    console.warn("⚠️ No se pudo migrar la BD antigua:", e);
+  }
+}
+
+// Abrimos (o creamos) la base de datos en la ubicación persistente.
+export const db = new Database(DB_PATH);
 
 // WAL mejora el rendimiento en lecturas/escrituras concurrentes.
 db.pragma("journal_mode = WAL");
+
+/**
+ * Crea un backup diario (uno por día) y conserva solo los 30 más recientes.
+ * Se llama al iniciar el servidor.
+ */
+export function backupDaily(): void {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const dest = join(BACKUPS_DIR, `data-${today}.db`);
+    if (!existsSync(dest)) {
+      db.exec(`VACUUM INTO '${sqlPath(dest)}'`);
+      console.log(`💾 Backup diario: ${dest}`);
+    }
+    const backups = readdirSync(BACKUPS_DIR)
+      .filter((f) => f.startsWith("data-") && f.endsWith(".db"))
+      .map((f) => ({ f, t: statSync(join(BACKUPS_DIR, f)).mtimeMs }))
+      .sort((a, b) => b.t - a.t);
+    for (const { f } of backups.slice(30)) {
+      rmSync(join(BACKUPS_DIR, f), { force: true });
+    }
+  } catch (e) {
+    console.warn("⚠️ No se pudo crear el backup diario:", e);
+  }
+}
 
 /**
  * Crea las tablas si no existen todavía.
@@ -154,5 +206,5 @@ export function initDb(): void {
     );
   `);
 
-  console.log("✅ Base de datos lista (tablas creadas/verificadas).");
+  console.log("✅ Base de datos lista (~/.pliego/data.db).");
 }

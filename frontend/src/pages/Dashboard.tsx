@@ -148,7 +148,7 @@ export default function Dashboard() {
         </Widget>
 
         {/* Atajo a Studio */}
-        <Widget title="Crear un guion" to="/studio" cta="Abrir Studio">
+        <Widget title="Crear un guion" to="/crear" cta="Abrir creación">
           <p className="text-sm text-muted">
             Genera guiones con timestamps, hooks, captions y adapta a otras plataformas.
           </p>

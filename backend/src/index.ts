@@ -8,7 +8,7 @@ import "dotenv/config"; // carga las variables de backend/.env
 import express from "express";
 import cors from "cors";
 
-import { initDb } from "./db.js";
+import { initDb, backupDaily } from "./db.js";
 import { booksRouter } from "./routes/books.js";
 import { grokRouter } from "./routes/grok.js";
 import { tiktokRouter } from "./routes/tiktok.js";
@@ -31,6 +31,9 @@ app.use(express.json({ limit: "25mb" })); // JSON en req.body (límite alto para
 
 // Creamos las tablas si no existen.
 initDb();
+
+// Backup diario de la base de datos (conserva los últimos 30).
+backupDaily();
 
 // Endpoint de salud, útil para comprobar que el servidor está vivo.
 app.get("/api/health", (_req, res) => {

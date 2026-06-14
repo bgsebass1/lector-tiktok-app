@@ -1,7 +1,7 @@
 {
-  "name": "lector-tiktok-backend",
+  "name": "pliego-backend",
   "version": "1.0.0",
-  "description": "Backend de la app personal: tracker de libros + ideas con Grok + dashboard TikTok",
+  "description": "Pliego — backend del sistema personal de lectura y creación de contenido",
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",

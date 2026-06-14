@@ -9,7 +9,7 @@ const ACTIONS = [
   { label: "Nueva idea", icon: "✨", to: "/ideas" },
   { label: "Nuevo libro", icon: "📚", to: "/libros" },
   { label: "Nueva cita", icon: "❝", to: "/citas" },
-  { label: "Nuevo guion", icon: "🎬", to: "/studio" },
+  { label: "Nuevo guion", icon: "🎬", to: "/crear" },
 ];
 
 export default function RadialMenu({

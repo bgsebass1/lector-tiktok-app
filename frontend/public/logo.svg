@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="Pliego">
+  <title>Pliego</title>
+  <path d="M50 62 C 38 56 27 55 16 58 L16 74 C 28 71 40 71 50 76 Z" fill="#12100c" stroke="#f5f0e1" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="M50 62 C 62 56 73 55 84 58 L84 74 C 72 71 60 71 50 76 Z" fill="#12100c" stroke="#f5f0e1" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="M50 62 L50 76" stroke="#f5f0e1" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M23 62 C 32 60 41 61 47 64" stroke="#f5f0e1" stroke-width="1" fill="none" opacity="0.5"/>
+  <path d="M53 64 C 59 61 68 60 77 62" stroke="#f5f0e1" stroke-width="1" fill="none" opacity="0.5"/>
+  <path d="M74 22 C 82 32 77 45 60 53 C 70 40 70 31 74 22 Z" fill="#d4af37"/>
+  <path d="M74 22 L61 49" stroke="#12100c" stroke-width="1" fill="none" opacity="0.3"/>
+  <path d="M47 64 L74 22" stroke="#d4af37" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M44 66 L51 61 L49 70 Z" fill="#d4af37"/>
+</svg>

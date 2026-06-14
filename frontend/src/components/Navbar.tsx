@@ -17,9 +17,15 @@ export default function Navbar({ onOpenSearch }: { onOpenSearch: () => void }) {
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-carbon/85 backdrop-blur">
       <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-3">
-        {/* Marca / logo del canal */}
-        <span className="shrink-0 font-display text-lg text-cream">
-          Libros nada más <span className="text-gold">·</span>
+        {/* Marca / logo */}
+        <span className="flex shrink-0 items-center gap-2">
+          <img src="/logo.svg" alt="" className="h-7 w-7" />
+          <span
+            className="text-xl text-cream"
+            style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 600, letterSpacing: "0.02em" }}
+          >
+            Pliego
+          </span>
         </span>
 
         {/* Enlaces (scrollables en pantallas pequeñas) */}

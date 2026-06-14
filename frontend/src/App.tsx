@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { Toaster } from "react-hot-toast";
 
-import Navbar from "./components/Navbar";
+import AppShell from "./components/shell/AppShell";
 import CommandPalette from "./components/CommandPalette";
 import RadialMenu from "./components/RadialMenu";
+import InstallPrompt from "./components/InstallPrompt";
 import PageTransition from "./components/PageTransition";
 
 import Dashboard from "./pages/Dashboard";
@@ -17,12 +18,15 @@ import Citas from "./pages/Citas";
 import Palabras from "./pages/Palabras";
 import Calendario from "./pages/Calendario";
 import Inspiracion from "./pages/Inspiracion";
+import EstudioHub from "./pages/EstudioHub";
+import Branding from "./pages/Branding";
+import Stub from "./pages/Stub";
 
-/** Páginas para los atajos Cmd+1..6. */
-const SHORTCUT_ROUTES = ["/", "/libros", "/studio", "/citas", "/calendario", "/tiktok"];
+/** Rutas para los atajos Cmd+1..6. */
+const SHORTCUT_ROUTES = ["/", "/libros", "/crear", "/citas", "/calendario", "/tiktok"];
 
 /**
- * Componente raíz: navbar + rutas con transiciones + capas globales
+ * Componente raíz: shell responsive + rutas con transiciones + capas globales
  * (Toaster, paleta de comandos Cmd+K, menú radial Cmd+N).
  */
 export default function App() {
@@ -31,7 +35,7 @@ export default function App() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [radialOpen, setRadialOpen] = useState(false);
 
-  // Atajos de teclado globales (mejora transversal 5).
+  // Atajos de teclado globales.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const mod = e.metaKey || e.ctrlKey;
@@ -53,31 +57,73 @@ export default function App() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen">
-      <Navbar onOpenSearch={() => setSearchOpen(true)} />
-
-      <main className="mx-auto max-w-7xl px-6 py-8">
+    <>
+      <AppShell onOpenSearch={() => setSearchOpen(true)}>
         {/* AnimatePresence + key por ruta = transición al cambiar de página. */}
         <AnimatePresence mode="wait">
           <PageTransition key={location.pathname}>
             <Routes location={location}>
+              {/* Inicio + lectura */}
               <Route path="/" element={<Dashboard />} />
               <Route path="/libros" element={<Books />} />
-              <Route path="/studio" element={<Studio />} />
+              <Route path="/libros/:id" element={<Stub title="Detalle del libro" note="Highlights y sesiones del libro — llega en la Parte B." />} />
+              <Route path="/leer" element={<Stub title="Sesión de lectura" note="Cronómetro de lectura con sonido ambiente — Parte B." />} />
+              <Route path="/leer/:bookId" element={<Stub title="Sesión de lectura" note="Cronómetro de lectura con sonido ambiente — Parte B." />} />
+
+              {/* Estudio */}
+              <Route path="/estudio" element={<EstudioHub />} />
+              <Route path="/flashcards" element={<Stub title="Flashcards" note="Repaso espaciado (SM-2) — Parte B." />} />
+              <Route path="/flashcards/nueva" element={<Stub title="Nueva flashcard" note="Parte B." />} />
+              <Route path="/dialogos" element={<Stub title="Diálogos con autores" note="Conversa con autores vía IA — Parte B." />} />
+              <Route path="/dialogos/nuevo" element={<Stub title="Nuevo diálogo" note="Parte B." />} />
+              <Route path="/dialogos/:id" element={<Stub title="Diálogo" note="Parte B." />} />
+              <Route path="/timeline" element={<Stub title="Timeline intelectual" note="Línea de tiempo navegable — Parte B." />} />
+
+              {/* Creación */}
+              <Route path="/crear" element={<Studio />} />
+              <Route path="/crear/*" element={<Studio />} />
+
+              {/* Personal / contenido */}
               <Route path="/citas" element={<Citas />} />
+              <Route path="/citas/:id" element={<Citas />} />
               <Route path="/palabras" element={<Palabras />} />
+              <Route path="/palabras/:id" element={<Palabras />} />
               <Route path="/calendario" element={<Calendario />} />
+              <Route path="/calendario/mes" element={<Calendario />} />
               <Route path="/inspiracion" element={<Inspiracion />} />
-              <Route path="/ideas" element={<Ideas />} />
+              <Route path="/constelacion" element={<Stub title="Constelación" note="Grafo de conexiones — Parte C." />} />
+              <Route path="/escribir" element={<Stub title="Escribir" note="Editor de escritura libre — Parte C." />} />
+              <Route path="/escribir/:id" element={<Stub title="Escribir" note="Parte C." />} />
+              <Route path="/recursos" element={<Stub title="Recursos B-roll" note="Banco de material visual — Parte C." />} />
               <Route path="/tiktok" element={<TikTok />} />
+              <Route path="/ideas" element={<Ideas />} />
+              <Route path="/coleccion" element={<Stub title="Colección" note="Cartas coleccionables de libros leídos — Parte F." />} />
+
+              {/* Identidad / configuración */}
+              <Route path="/branding" element={<Branding />} />
+              <Route path="/settings" element={<Stub title="Configuración" note="Ajustes generales — Parte E." />} />
+              <Route path="/settings/apariencia" element={<Stub title="Apariencia" note="Temas visuales — Parte D." />} />
+              <Route path="/settings/sonidos" element={<Stub title="Sonidos" note="Sonidos de interfaz — Parte D." />} />
+              <Route path="/settings/backup" element={<Stub title="Backup" note="Exportar / importar tus datos — Parte E." />} />
+              <Route path="/settings/atajos" element={<Stub title="Atajos de teclado" note="Parte E." />} />
+              <Route path="/onboarding" element={<Stub title="Bienvenido a Pliego" note="Flujo de primera vez — Parte E." />} />
+
+              {/* Cualquier otra ruta vuelve al inicio. */}
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </PageTransition>
         </AnimatePresence>
-      </main>
+      </AppShell>
 
       {/* Capas globales */}
       <CommandPalette open={searchOpen} onClose={() => setSearchOpen(false)} />
-      <RadialMenu open={radialOpen} setOpen={setRadialOpen} />
+      {/* Menú radial "+" solo en desktop (en móvil está el bottom-nav "Crear"). */}
+      <div className="hidden md:block">
+        <RadialMenu open={radialOpen} setOpen={setRadialOpen} />
+      </div>
+
+      {/* Banner para instalar la PWA (iOS/Android). */}
+      <InstallPrompt />
 
       {/* Notificaciones (toasts) con estilo dark editorial. */}
       <Toaster
@@ -93,6 +139,6 @@ export default function App() {
           error: { duration: 6000 },
         }}
       />
-    </div>
+    </>
   );
 }

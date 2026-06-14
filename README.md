@@ -1,9 +1,8 @@
-# Libros nada más · Estudio de contenido 📚✨📊🎬
+# Pliego
 
-Estudio personal de creación de contenido para el canal de TikTok
-*"Libros nada más 😁"* (filosofía, literatura e historia del lenguaje).
+> Tu sistema personal de lectura, creación de contenido y aprendizaje.
 
-De app de 3 funciones pasó a un **estudio completo** con 11 módulos.
+*(README en reescritura — se completa en la fase final del proyecto. El nombre pasó de "Libros nada más" a **Pliego**.)*
 
 ---
 
