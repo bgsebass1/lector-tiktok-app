@@ -234,6 +234,19 @@ export function initDb(): void {
       created_at TEXT DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE SET NULL
     );
+
+    /* ---- Módulo: Recursos B-roll (banco de material visual) ---- */
+    CREATE TABLE IF NOT EXISTS resources (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      type TEXT NOT NULL,            -- video | imagen | url | captura
+      title TEXT NOT NULL,
+      url_or_path TEXT NOT NULL,
+      description TEXT,
+      tags TEXT,
+      mood TEXT,
+      thumbnail TEXT,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
   `);
 
   console.log("✅ Base de datos lista (~/.pliego/data.db).");

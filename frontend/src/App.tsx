@@ -24,6 +24,7 @@ import Dialogos from "./pages/Dialogos";
 import DialogoNuevo from "./pages/DialogoNuevo";
 import Flashcards from "./pages/Flashcards";
 import FlashcardsStudy from "./pages/FlashcardsStudy";
+import Recursos from "./pages/Recursos";
 import Stub from "./pages/Stub";
 
 /** Rutas para los atajos Cmd+1..6. */
@@ -99,7 +100,7 @@ export default function App() {
               <Route path="/constelacion" element={<Stub title="Constelación" note="Grafo de conexiones — Parte C." />} />
               <Route path="/escribir" element={<Stub title="Escribir" note="Editor de escritura libre — Parte C." />} />
               <Route path="/escribir/:id" element={<Stub title="Escribir" note="Parte C." />} />
-              <Route path="/recursos" element={<Stub title="Recursos B-roll" note="Banco de material visual — Parte C." />} />
+              <Route path="/recursos" element={<Recursos />} />
               <Route path="/tiktok" element={<TikTok />} />
               <Route path="/ideas" element={<Ideas />} />
               <Route path="/coleccion" element={<Stub title="Colección" note="Cartas coleccionables de libros leídos — Parte F." />} />

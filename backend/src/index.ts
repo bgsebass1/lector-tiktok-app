@@ -23,6 +23,7 @@ import { backupRouter } from "./routes/backup.js";
 import { searchRouter } from "./routes/search.js";
 import { dialoguesRouter } from "./routes/dialogues.js";
 import { flashcardsRouter } from "./routes/flashcards.js";
+import { resourcesRouter } from "./routes/resources.js";
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 3001);
@@ -57,6 +58,7 @@ app.use("/api", backupRouter); // expone /api/backup y /api/restore
 app.use("/api/search", searchRouter);
 app.use("/api/dialogues", dialoguesRouter);
 app.use("/api/flashcards", flashcardsRouter);
+app.use("/api/resources", resourcesRouter);
 
 
 app.listen(PORT, () => {

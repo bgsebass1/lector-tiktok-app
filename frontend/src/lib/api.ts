@@ -298,6 +298,30 @@ export interface FlashcardStats {
   decks: DeckStat[];
 }
 
+/* ---------- Recursos B-roll ---------- */
+
+export interface Resource {
+  id: number;
+  type: string;
+  title: string;
+  url_or_path: string;
+  description: string | null;
+  tags: string | null;
+  mood: string | null;
+  thumbnail: string | null;
+  created_at: string;
+}
+
+export interface ResourceInput {
+  type: string;
+  title: string;
+  url_or_path: string;
+  description?: string | null;
+  tags?: string | null;
+  mood?: string | null;
+  thumbnail?: string | null;
+}
+
 /* ---------- Helper genérico ---------- */
 
 /**
@@ -423,6 +447,15 @@ export const api = {
 
   deleteFlashcard: (id: number) =>
     request<{ ok: boolean }>(`/api/flashcards/${id}`, { method: "DELETE" }),
+
+  // --- Recursos B-roll ---
+  listResources: () => request<Resource[]>("/api/resources"),
+
+  createResource: (data: ResourceInput) =>
+    request<Resource>("/api/resources", { method: "POST", body: JSON.stringify(data) }),
+
+  deleteResource: (id: number) =>
+    request<{ ok: boolean }>(`/api/resources/${id}`, { method: "DELETE" }),
 
   // --- TikTok ---
   getTikTokStats: () => request<TikTokStats>("/api/tiktok/stats"),
