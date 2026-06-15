@@ -15,6 +15,12 @@ const TYPE_META: Record<SearchResult["type"], { label: string; icon: string }> =
   palabra: { label: "Palabras", icon: "🔤" },
   idea: { label: "Ideas", icon: "✨" },
   guion: { label: "Guiones", icon: "🎬" },
+  escrito: { label: "Escritos", icon: "✍️" },
+  highlight: { label: "Subrayados", icon: "🖍️" },
+  flashcard: { label: "Flashcards", icon: "🃏" },
+  dialogo: { label: "Diálogos", icon: "🗣️" },
+  recurso: { label: "Recursos", icon: "🎞️" },
+  evento: { label: "Timeline", icon: "📜" },
 };
 
 /**

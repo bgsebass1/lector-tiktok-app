@@ -193,7 +193,18 @@ export interface RepurposePack {
 }
 
 export interface SearchResult {
-  type: "libro" | "cita" | "palabra" | "idea" | "guion";
+  type:
+    | "libro"
+    | "cita"
+    | "palabra"
+    | "idea"
+    | "guion"
+    | "escrito"
+    | "highlight"
+    | "flashcard"
+    | "dialogo"
+    | "recurso"
+    | "evento";
   id: number;
   title: string;
   subtitle?: string;
