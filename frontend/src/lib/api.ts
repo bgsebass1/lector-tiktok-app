@@ -529,6 +529,8 @@ export const api = {
   // --- Lectura: sesiones + highlights ---
   readingStats: () => request<ReadingStats>("/api/reading/stats"),
 
+  readingHeatmap: () => request<Array<{ d: string; m: number }>>("/api/reading/heatmap"),
+
   listSessions: (bookId?: number) =>
     request<ReadingSession[]>(`/api/reading/sessions${bookId ? `?bookId=${bookId}` : ""}`),
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api, type Book, type ReadingStats, type ReadingSession } from "../lib/api";
+import ReadingHeatmap from "../components/ReadingHeatmap";
 
 /** Formatea minutos como "Xh Ym". */
 export function fmtMin(min: number): string {
@@ -37,6 +38,14 @@ export default function Leer() {
         <Stat label="Tiempo total" value={stats ? fmtMin(stats.totalMinutes) : "—"} />
         <Stat label="Sesiones" value={stats?.totalSessions ?? 0} />
         <Stat label="Libros" value={stats?.booksTouched ?? 0} />
+      </div>
+
+      {/* Heatmap anual */}
+      <div className="mb-8">
+        <h2 className="mb-3 text-2xl text-cream">Tu año de lectura</h2>
+        <div className="card p-4">
+          <ReadingHeatmap />
+        </div>
       </div>
 
       {/* Elegir libro */}

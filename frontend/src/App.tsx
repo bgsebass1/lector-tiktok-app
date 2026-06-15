@@ -28,6 +28,7 @@ import Recursos from "./pages/Recursos";
 import Timeline from "./pages/Timeline";
 import Leer from "./pages/Leer";
 import LeerSesion from "./pages/LeerSesion";
+import Apariencia from "./pages/Apariencia";
 import Stub from "./pages/Stub";
 
 /** Rutas para los atajos Cmd+1..6. */
@@ -111,7 +112,7 @@ export default function App() {
               {/* Identidad / configuración */}
               <Route path="/branding" element={<Branding />} />
               <Route path="/settings" element={<Stub title="Configuración" note="Ajustes generales — Parte E." />} />
-              <Route path="/settings/apariencia" element={<Stub title="Apariencia" note="Temas visuales — Parte D." />} />
+              <Route path="/settings/apariencia" element={<Apariencia />} />
               <Route path="/settings/sonidos" element={<Stub title="Sonidos" note="Sonidos de interfaz — Parte D." />} />
               <Route path="/settings/backup" element={<Stub title="Backup" note="Exportar / importar tus datos — Parte E." />} />
               <Route path="/settings/atajos" element={<Stub title="Atajos de teclado" note="Parte E." />} />

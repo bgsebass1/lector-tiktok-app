@@ -4,14 +4,15 @@ export default {
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
-      // Paleta editorial oscura.
+      // Paleta editorial. Los valores vienen de variables CSS (canales R G B)
+      // para poder cambiar de tema en caliente y conservar las opacidades (/15).
       colors: {
-        carbon: "#0a0a0a", // fondo negro carbón
-        surface: "#141414", // tarjetas / paneles
-        border: "#262626",
-        gold: "#d4af37", // dorado suave (acento)
-        cream: "#f5f0e1", // blanco crema (texto principal)
-        muted: "#8a8a82", // texto secundario
+        carbon: "rgb(var(--carbon) / <alpha-value>)", // fondo
+        surface: "rgb(var(--surface) / <alpha-value>)", // tarjetas / paneles
+        border: "rgb(var(--border) / <alpha-value>)",
+        gold: "rgb(var(--gold) / <alpha-value>)", // acento
+        cream: "rgb(var(--cream) / <alpha-value>)", // texto principal
+        muted: "rgb(var(--muted) / <alpha-value>)", // texto secundario
       },
       fontFamily: {
         // Serif para títulos, sans para cuerpo, mono para fechas/stats.

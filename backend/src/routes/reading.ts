@@ -24,6 +24,14 @@ readingRouter.get("/stats", (_req: Request, res: Response) => {
   res.json(row);
 });
 
+/* ---------- Heatmap anual ---------- */
+readingRouter.get("/heatmap", (_req: Request, res: Response) => {
+  const rows = db
+    .prepare("SELECT date(created_at) d, SUM(minutes) m FROM reading_sessions GROUP BY date(created_at)")
+    .all() as Array<{ d: string; m: number }>;
+  res.json(rows);
+});
+
 /* ---------- Sesiones ---------- */
 readingRouter.get("/sessions", (req: Request, res: Response) => {
   const bookId = req.query.bookId ? Number(req.query.bookId) : null;

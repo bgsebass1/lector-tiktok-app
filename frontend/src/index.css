@@ -2,7 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Estilos base de la aplicación: estética dark editorial. */
+/* ---------------------------------------------------------------------------
+ * Temas. Cada paleta define los canales R G B de los 6 tokens.
+ * Se cambia poniendo data-theme="..." en <html> (ver lib/theme.ts).
+ * ------------------------------------------------------------------------- */
+:root,
+:root[data-theme="carbon"] {
+  --carbon: 10 10 10;
+  --surface: 20 20 20;
+  --border: 38 38 38;
+  --gold: 212 175 55;
+  --cream: 245 240 225;
+  --muted: 138 138 130;
+}
+
+:root[data-theme="pergamino"] {
+  --carbon: 244 236 216; /* papel cálido (fondo claro) */
+  --surface: 251 246 233;
+  --border: 224 212 184;
+  --gold: 154 107 47; /* sepia tostado */
+  --cream: 58 47 29; /* texto marrón oscuro */
+  --muted: 138 122 92;
+}
+
+:root[data-theme="nocturno"] {
+  --carbon: 11 18 32; /* azul medianoche */
+  --surface: 19 28 46;
+  --border: 36 48 73;
+  --gold: 138 180 248; /* acento azul */
+  --cream: 220 227 240;
+  --muted: 124 137 163;
+}
+
+:root[data-theme="bosque"] {
+  --carbon: 12 20 16; /* verde profundo */
+  --surface: 20 32 26;
+  --border: 38 53 44;
+  --gold: 155 191 122; /* salvia */
+  --cream: 232 239 226;
+  --muted: 138 154 130;
+}
+
+/* Estilos base de la aplicación: estética editorial. */
 @layer base {
   body {
     @apply bg-carbon text-cream font-sans antialiased;
@@ -59,12 +100,12 @@
   height: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: rgb(var(--carbon));
 }
 ::-webkit-scrollbar-thumb {
-  background: #2a2a2a;
+  background: rgb(var(--border));
   border-radius: 6px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3a3a3a;
+  background: rgb(var(--muted));
 }

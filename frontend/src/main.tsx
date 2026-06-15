@@ -3,6 +3,10 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App.tsx";
 import "./index.css";
+import { initTheme } from "./lib/theme";
+
+// Aplicamos el tema guardado antes de renderizar (evita parpadeo).
+initTheme();
 
 // Montamos la app dentro de <BrowserRouter> para tener navegación por rutas.
 ReactDOM.createRoot(document.getElementById("root")!).render(
