@@ -25,6 +25,7 @@ import DialogoNuevo from "./pages/DialogoNuevo";
 import Flashcards from "./pages/Flashcards";
 import FlashcardsStudy from "./pages/FlashcardsStudy";
 import Recursos from "./pages/Recursos";
+import Timeline from "./pages/Timeline";
 import Stub from "./pages/Stub";
 
 /** Rutas para los atajos Cmd+1..6. */
@@ -83,7 +84,7 @@ export default function App() {
               <Route path="/dialogos" element={<Dialogos />} />
               <Route path="/dialogos/nuevo" element={<DialogoNuevo />} />
               <Route path="/dialogos/:id" element={<DialogoNuevo />} />
-              <Route path="/timeline" element={<Stub title="Timeline intelectual" note="Línea de tiempo navegable — Parte B." />} />
+              <Route path="/timeline" element={<Timeline />} />
 
               {/* Creación */}
               <Route path="/crear" element={<Studio />} />

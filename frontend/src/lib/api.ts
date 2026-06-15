@@ -322,6 +322,38 @@ export interface ResourceInput {
   thumbnail?: string | null;
 }
 
+/* ---------- Timeline intelectual ---------- */
+
+export interface TimelineEntry {
+  kind: string; // "libro" | "evento" | "autor" | "idea" | "hito"
+  id: number;
+  year: number;
+  title: string;
+  subtitle: string | null;
+  cover: string | null;
+  isEvent: boolean;
+}
+
+export interface TimelineUndated {
+  kind: string;
+  id: number;
+  title: string;
+  subtitle: string | null;
+  cover: string | null;
+}
+
+export interface TimelineData {
+  entries: TimelineEntry[];
+  undated: TimelineUndated[];
+}
+
+export interface TimelineEventInput {
+  year: number;
+  title: string;
+  description?: string;
+  kind?: string;
+}
+
 /* ---------- Helper genérico ---------- */
 
 /**
@@ -456,6 +488,15 @@ export const api = {
 
   deleteResource: (id: number) =>
     request<{ ok: boolean }>(`/api/resources/${id}`, { method: "DELETE" }),
+
+  // --- Timeline intelectual ---
+  getTimeline: () => request<TimelineData>("/api/timeline"),
+
+  addTimelineEvent: (data: TimelineEventInput) =>
+    request<{ id: number }>("/api/timeline/events", { method: "POST", body: JSON.stringify(data) }),
+
+  deleteTimelineEvent: (id: number) =>
+    request<{ ok: boolean }>(`/api/timeline/events/${id}`, { method: "DELETE" }),
 
   // --- TikTok ---
   getTikTokStats: () => request<TikTokStats>("/api/tiktok/stats"),

@@ -247,6 +247,16 @@ export function initDb(): void {
       thumbnail TEXT,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
+
+    /* ---- Módulo: Timeline intelectual (eventos personalizados) ---- */
+    CREATE TABLE IF NOT EXISTS timeline_events (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      year INTEGER NOT NULL,
+      title TEXT NOT NULL,
+      description TEXT,
+      kind TEXT NOT NULL DEFAULT 'evento',   -- evento | autor | idea | hito
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
   `);
 
   console.log("✅ Base de datos lista (~/.pliego/data.db).");
