@@ -26,6 +26,8 @@ import Flashcards from "./pages/Flashcards";
 import FlashcardsStudy from "./pages/FlashcardsStudy";
 import Recursos from "./pages/Recursos";
 import Timeline from "./pages/Timeline";
+import Leer from "./pages/Leer";
+import LeerSesion from "./pages/LeerSesion";
 import Stub from "./pages/Stub";
 
 /** Rutas para los atajos Cmd+1..6. */
@@ -73,8 +75,8 @@ export default function App() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/libros" element={<Books />} />
               <Route path="/libros/:id" element={<Stub title="Detalle del libro" note="Highlights y sesiones del libro — llega en la Parte B." />} />
-              <Route path="/leer" element={<Stub title="Sesión de lectura" note="Cronómetro de lectura con sonido ambiente — Parte B." />} />
-              <Route path="/leer/:bookId" element={<Stub title="Sesión de lectura" note="Cronómetro de lectura con sonido ambiente — Parte B." />} />
+              <Route path="/leer" element={<Leer />} />
+              <Route path="/leer/:bookId" element={<LeerSesion />} />
 
               {/* Estudio */}
               <Route path="/estudio" element={<EstudioHub />} />

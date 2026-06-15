@@ -354,6 +354,34 @@ export interface TimelineEventInput {
   kind?: string;
 }
 
+/* ---------- Lectura: sesiones + highlights ---------- */
+
+export interface ReadingSession {
+  id: number;
+  book_id: number | null;
+  book_title: string | null;
+  minutes: number;
+  pages: number | null;
+  note: string | null;
+  created_at: string;
+}
+
+export interface ReadingStats {
+  totalMinutes: number;
+  totalSessions: number;
+  booksTouched: number;
+}
+
+export interface Highlight {
+  id: number;
+  book_id: number | null;
+  book_title: string | null;
+  text: string;
+  note: string | null;
+  page: number | null;
+  created_at: string;
+}
+
 /* ---------- Helper genérico ---------- */
 
 /**
@@ -497,6 +525,27 @@ export const api = {
 
   deleteTimelineEvent: (id: number) =>
     request<{ ok: boolean }>(`/api/timeline/events/${id}`, { method: "DELETE" }),
+
+  // --- Lectura: sesiones + highlights ---
+  readingStats: () => request<ReadingStats>("/api/reading/stats"),
+
+  listSessions: (bookId?: number) =>
+    request<ReadingSession[]>(`/api/reading/sessions${bookId ? `?bookId=${bookId}` : ""}`),
+
+  createSession: (data: { book_id: number | null; minutes: number; pages?: number | null; note?: string | null }) =>
+    request<ReadingSession>("/api/reading/sessions", { method: "POST", body: JSON.stringify(data) }),
+
+  deleteSession: (id: number) =>
+    request<{ ok: boolean }>(`/api/reading/sessions/${id}`, { method: "DELETE" }),
+
+  listHighlights: (bookId?: number) =>
+    request<Highlight[]>(`/api/reading/highlights${bookId ? `?bookId=${bookId}` : ""}`),
+
+  createHighlight: (data: { book_id: number | null; text: string; note?: string | null; page?: number | null }) =>
+    request<Highlight>("/api/reading/highlights", { method: "POST", body: JSON.stringify(data) }),
+
+  deleteHighlight: (id: number) =>
+    request<{ ok: boolean }>(`/api/reading/highlights/${id}`, { method: "DELETE" }),
 
   // --- TikTok ---
   getTikTokStats: () => request<TikTokStats>("/api/tiktok/stats"),

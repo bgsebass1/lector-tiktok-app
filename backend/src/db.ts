@@ -257,6 +257,28 @@ export function initDb(): void {
       kind TEXT NOT NULL DEFAULT 'evento',   -- evento | autor | idea | hito
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
+
+    /* ---- Módulo: Sesiones de lectura ---- */
+    CREATE TABLE IF NOT EXISTS reading_sessions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      book_id INTEGER,
+      minutes INTEGER NOT NULL DEFAULT 0,
+      pages INTEGER,
+      note TEXT,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE SET NULL
+    );
+
+    /* ---- Módulo: Highlights / anotaciones de lectura ---- */
+    CREATE TABLE IF NOT EXISTS highlights (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      book_id INTEGER,
+      text TEXT NOT NULL,
+      note TEXT,
+      page INTEGER,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE SET NULL
+    );
   `);
 
   console.log("✅ Base de datos lista (~/.pliego/data.db).");
