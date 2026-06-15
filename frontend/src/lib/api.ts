@@ -233,6 +233,43 @@ export interface TikTokAnalytics {
   engagementByTopic: Array<{ topic: string; avgEngagement: number; videos: number }>;
 }
 
+/* ---------- Diálogos con autores ---------- */
+
+/** Autor con el que se puede dialogar (campos públicos). */
+export interface Author {
+  id: string;
+  name: string;
+  era: string;
+  blurb: string;
+  accent: string;
+}
+
+/** Un mensaje del chat: del lector o del autor. */
+export interface DialogueMessage {
+  role: "user" | "author";
+  content: string;
+}
+
+/** Resumen de una conversación guardada. */
+export interface SavedDialogue {
+  id: number;
+  author_id: string;
+  author_name: string;
+  created_at: string;
+  count: number;
+  preview: string;
+}
+
+/** Conversación completa. */
+export interface DialogueDetail {
+  id: number;
+  author_id: string;
+  author_name: string;
+  messages: DialogueMessage[];
+  created_at: string;
+  updated_at: string | null;
+}
+
 /* ---------- Helper genérico ---------- */
 
 /**
@@ -305,6 +342,34 @@ export const api = {
     ),
 
   listIdeas: () => request<SavedIdeas[]>("/api/grok/ideas"),
+
+  // --- Diálogos con autores ---
+  listAuthors: () => request<Author[]>("/api/dialogues/authors"),
+
+  dialogueReply: (authorId: string, history: DialogueMessage[], message: string) =>
+    request<{ reply: string }>("/api/dialogues/reply", {
+      method: "POST",
+      body: JSON.stringify({ authorId, history, message }),
+    }),
+
+  listDialogues: () => request<SavedDialogue[]>("/api/dialogues"),
+
+  getDialogue: (id: number) => request<DialogueDetail>(`/api/dialogues/${id}`),
+
+  saveDialogue: (authorId: string, authorName: string, messages: DialogueMessage[]) =>
+    request<{ id: number }>("/api/dialogues", {
+      method: "POST",
+      body: JSON.stringify({ authorId, authorName, messages }),
+    }),
+
+  updateDialogue: (id: number, messages: DialogueMessage[]) =>
+    request<{ ok: boolean }>(`/api/dialogues/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({ messages }),
+    }),
+
+  deleteDialogue: (id: number) =>
+    request<{ ok: boolean }>(`/api/dialogues/${id}`, { method: "DELETE" }),
 
   // --- TikTok ---
   getTikTokStats: () => request<TikTokStats>("/api/tiktok/stats"),

@@ -310,6 +310,36 @@ Responde ÚNICAMENTE en JSON válido:
   return parsed.ideas ?? [];
 }
 
+/* ---------- Módulo: Diálogos con autores ---------- */
+
+/** Un mensaje del chat: del lector o del autor. */
+export interface DialogueMessage {
+  role: "user" | "author";
+  content: string;
+}
+
+/**
+ * Genera la respuesta de un autor a partir de su system prompt, el historial
+ * de la conversación y el mensaje nuevo del lector. El historial se incluye en
+ * el prompt para que el autor mantenga el hilo.
+ */
+export async function dialogueWithAuthor(input: {
+  systemPrompt: string;
+  history: DialogueMessage[];
+  message: string;
+}): Promise<string> {
+  const transcript = input.history
+    .map((m) => `${m.role === "user" ? "Lector" : "Tú"}: ${m.content}`)
+    .join("\n");
+
+  const user = `${transcript ? `Conversación hasta ahora:\n${transcript}\n\n` : ""}El lector te dice: ${input.message}
+
+Responde en personaje, en primera persona.`;
+
+  const text = await grokText(input.systemPrompt, user);
+  return text.trim();
+}
+
 /* ---------- Módulo 10: Insights de analytics ---------- */
 
 export async function analyzePerformance(data: unknown): Promise<string[]> {

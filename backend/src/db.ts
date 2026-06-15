@@ -209,6 +209,16 @@ export function initDb(): void {
       tags TEXT,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
+
+    /* ---- Módulo: Diálogos con autores ---- */
+    CREATE TABLE IF NOT EXISTS dialogues (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      author_id TEXT NOT NULL,
+      author_name TEXT NOT NULL,
+      messages TEXT NOT NULL,        -- JSON [{ role: 'user'|'author', content }]
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT
+    );
   `);
 
   console.log("✅ Base de datos lista (~/.pliego/data.db).");

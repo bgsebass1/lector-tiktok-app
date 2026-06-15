@@ -21,6 +21,7 @@ import { seriesRouter } from "./routes/series.js";
 import { inspirationRouter } from "./routes/inspiration.js";
 import { backupRouter } from "./routes/backup.js";
 import { searchRouter } from "./routes/search.js";
+import { dialoguesRouter } from "./routes/dialogues.js";
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 3001);
@@ -53,6 +54,7 @@ app.use("/api/series", seriesRouter);
 app.use("/api/inspiration", inspirationRouter);
 app.use("/api", backupRouter); // expone /api/backup y /api/restore
 app.use("/api/search", searchRouter);
+app.use("/api/dialogues", dialoguesRouter);
 
 
 app.listen(PORT, () => {

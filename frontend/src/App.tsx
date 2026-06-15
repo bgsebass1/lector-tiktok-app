@@ -20,6 +20,8 @@ import Calendario from "./pages/Calendario";
 import Inspiracion from "./pages/Inspiracion";
 import EstudioHub from "./pages/EstudioHub";
 import Branding from "./pages/Branding";
+import Dialogos from "./pages/Dialogos";
+import DialogoNuevo from "./pages/DialogoNuevo";
 import Stub from "./pages/Stub";
 
 /** Rutas para los atajos Cmd+1..6. */
@@ -74,9 +76,9 @@ export default function App() {
               <Route path="/estudio" element={<EstudioHub />} />
               <Route path="/flashcards" element={<Stub title="Flashcards" note="Repaso espaciado (SM-2) — Parte B." />} />
               <Route path="/flashcards/nueva" element={<Stub title="Nueva flashcard" note="Parte B." />} />
-              <Route path="/dialogos" element={<Stub title="Diálogos con autores" note="Conversa con autores vía IA — Parte B." />} />
-              <Route path="/dialogos/nuevo" element={<Stub title="Nuevo diálogo" note="Parte B." />} />
-              <Route path="/dialogos/:id" element={<Stub title="Diálogo" note="Parte B." />} />
+              <Route path="/dialogos" element={<Dialogos />} />
+              <Route path="/dialogos/nuevo" element={<DialogoNuevo />} />
+              <Route path="/dialogos/:id" element={<DialogoNuevo />} />
               <Route path="/timeline" element={<Stub title="Timeline intelectual" note="Línea de tiempo navegable — Parte B." />} />
 
               {/* Creación */}
