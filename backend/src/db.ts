@@ -20,8 +20,13 @@ import { existsSync, mkdirSync, readdirSync, statSync, rmSync } from "node:fs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-/** Carpeta de datos persistente del usuario. */
-export const DATA_DIR = join(homedir(), ".pliego");
+/**
+ * Carpeta de datos persistente.
+ *  - En local: ~/.pliego
+ *  - En Railway/servidor: se define PLIEGO_DATA_DIR apuntando a un volumen
+ *    persistente (ej. /data) para que la BD sobreviva a cada despliegue.
+ */
+export const DATA_DIR = process.env.PLIEGO_DATA_DIR || join(homedir(), ".pliego");
 export const BACKUPS_DIR = join(DATA_DIR, "backups");
 const DB_PATH = join(DATA_DIR, "data.db");
 

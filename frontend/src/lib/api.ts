@@ -235,9 +235,17 @@ export interface TikTokAnalytics {
 
 /* ---------- Helper genérico ---------- */
 
+/**
+ * Base de la API.
+ *  - En producción (Vercel) se define VITE_API_URL con el dominio del backend
+ *    en Railway, p. ej. "https://pliego-backend.up.railway.app".
+ *  - En local queda vacío: se usan rutas relativas (/api/...) y el proxy de Vite.
+ */
+const API_BASE = (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "");
+
 /** Hace una petición y lanza un error legible si la respuesta no es 2xx. */
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(url, {
+  const res = await fetch(API_BASE + url, {
     headers: { "Content-Type": "application/json" },
     ...options,
   });
