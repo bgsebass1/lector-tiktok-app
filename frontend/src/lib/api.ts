@@ -270,6 +270,34 @@ export interface DialogueDetail {
   updated_at: string | null;
 }
 
+/* ---------- Flashcards ---------- */
+
+export interface Flashcard {
+  id: number;
+  book_id: number | null;
+  deck: string;
+  front: string;
+  back: string;
+  interval_days: number;
+  ease_factor: number;
+  reps: number;
+  due_date: string | null;
+  created_at: string;
+}
+
+export interface DeckStat {
+  deck: string;
+  total: number;
+  due: number;
+}
+
+export interface FlashcardStats {
+  total: number;
+  due: number;
+  mastered: number;
+  decks: DeckStat[];
+}
+
 /* ---------- Helper genérico ---------- */
 
 /**
@@ -370,6 +398,31 @@ export const api = {
 
   deleteDialogue: (id: number) =>
     request<{ ok: boolean }>(`/api/dialogues/${id}`, { method: "DELETE" }),
+
+  // --- Flashcards ---
+  listFlashcards: () => request<Flashcard[]>("/api/flashcards"),
+
+  dueFlashcards: () => request<Flashcard[]>("/api/flashcards/due"),
+
+  flashcardStats: () => request<FlashcardStats>("/api/flashcards/stats"),
+
+  createFlashcard: (data: { front: string; back: string; deck?: string; book_id?: number | null }) =>
+    request<Flashcard>("/api/flashcards", { method: "POST", body: JSON.stringify(data) }),
+
+  generateFlashcards: (bookId: number) =>
+    request<{ created: number; deck: string }>("/api/flashcards/generate-from-book", {
+      method: "POST",
+      body: JSON.stringify({ bookId }),
+    }),
+
+  reviewFlashcard: (id: number, quality: "dificil" | "bien" | "facil") =>
+    request<{ id: number }>(`/api/flashcards/${id}/review`, {
+      method: "PATCH",
+      body: JSON.stringify({ quality }),
+    }),
+
+  deleteFlashcard: (id: number) =>
+    request<{ ok: boolean }>(`/api/flashcards/${id}`, { method: "DELETE" }),
 
   // --- TikTok ---
   getTikTokStats: () => request<TikTokStats>("/api/tiktok/stats"),

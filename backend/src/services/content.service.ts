@@ -340,6 +340,34 @@ Responde en personaje, en primera persona.`;
   return text.trim();
 }
 
+/* ---------- Módulo: Flashcards ---------- */
+
+/** Una flashcard generada (anverso/reverso). */
+export interface FlashcardSeed {
+  front: string;
+  back: string;
+}
+
+/** Genera N flashcards de repaso sobre un libro. */
+export async function generateFlashcards(input: {
+  title: string;
+  author: string;
+  count?: number;
+}): Promise<FlashcardSeed[]> {
+  const n = input.count ?? 10;
+  const system = `${CHANNEL_CONTEXT} Eres un tutor que crea tarjetas de repaso (flashcards) claras y memorables.`;
+  const user = `Crea ${n} flashcards sobre el libro "${input.title}" de ${input.author}.
+Cada flashcard tiene:
+- front: una pregunta o concepto clave (corto)
+- back: la respuesta o explicación concisa (1-3 frases)
+Cubre ideas centrales, personajes, citas y conceptos importantes del libro.
+
+Responde ÚNICAMENTE en JSON válido:
+{ "cards": [ { "front": "...", "back": "..." } ] }`;
+  const parsed = await grokJson<{ cards: FlashcardSeed[] }>(system, user);
+  return parsed.cards ?? [];
+}
+
 /* ---------- Módulo 10: Insights de analytics ---------- */
 
 export async function analyzePerformance(data: unknown): Promise<string[]> {

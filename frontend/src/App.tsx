@@ -22,6 +22,8 @@ import EstudioHub from "./pages/EstudioHub";
 import Branding from "./pages/Branding";
 import Dialogos from "./pages/Dialogos";
 import DialogoNuevo from "./pages/DialogoNuevo";
+import Flashcards from "./pages/Flashcards";
+import FlashcardsStudy from "./pages/FlashcardsStudy";
 import Stub from "./pages/Stub";
 
 /** Rutas para los atajos Cmd+1..6. */
@@ -74,8 +76,9 @@ export default function App() {
 
               {/* Estudio */}
               <Route path="/estudio" element={<EstudioHub />} />
-              <Route path="/flashcards" element={<Stub title="Flashcards" note="Repaso espaciado (SM-2) — Parte B." />} />
-              <Route path="/flashcards/nueva" element={<Stub title="Nueva flashcard" note="Parte B." />} />
+              <Route path="/flashcards" element={<Flashcards />} />
+              <Route path="/flashcards/estudiar" element={<FlashcardsStudy />} />
+              <Route path="/flashcards/nueva" element={<Flashcards />} />
               <Route path="/dialogos" element={<Dialogos />} />
               <Route path="/dialogos/nuevo" element={<DialogoNuevo />} />
               <Route path="/dialogos/:id" element={<DialogoNuevo />} />

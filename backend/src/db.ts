@@ -219,6 +219,21 @@ export function initDb(): void {
       created_at TEXT DEFAULT CURRENT_TIMESTAMP,
       updated_at TEXT
     );
+
+    /* ---- Módulo: Flashcards (repaso espaciado SM-2) ---- */
+    CREATE TABLE IF NOT EXISTS flashcards (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      book_id INTEGER,
+      deck TEXT NOT NULL DEFAULT 'General',
+      front TEXT NOT NULL,
+      back TEXT NOT NULL,
+      interval_days INTEGER NOT NULL DEFAULT 0,
+      ease_factor REAL NOT NULL DEFAULT 2.5,
+      reps INTEGER NOT NULL DEFAULT 0,
+      due_date TEXT,                 -- ISO (YYYY-MM-DD); NULL = nueva (vence hoy)
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE SET NULL
+    );
   `);
 
   console.log("✅ Base de datos lista (~/.pliego/data.db).");
