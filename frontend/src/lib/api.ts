@@ -382,6 +382,24 @@ export interface Highlight {
   created_at: string;
 }
 
+/* ---------- Escribir ---------- */
+
+export interface Writing {
+  id: number;
+  title: string;
+  content: string;
+  created_at: string;
+  updated_at: string | null;
+}
+
+export interface WritingSummary {
+  id: number;
+  title: string;
+  snippet: string;
+  created_at: string;
+  updated_at: string | null;
+}
+
 /* ---------- Helper genérico ---------- */
 
 /**
@@ -530,6 +548,20 @@ export const api = {
   readingStats: () => request<ReadingStats>("/api/reading/stats"),
 
   readingHeatmap: () => request<Array<{ d: string; m: number }>>("/api/reading/heatmap"),
+
+  // --- Escribir ---
+  listWritings: () => request<WritingSummary[]>("/api/writings"),
+
+  getWriting: (id: number) => request<Writing>(`/api/writings/${id}`),
+
+  createWriting: (data?: { title?: string; content?: string }) =>
+    request<Writing>("/api/writings", { method: "POST", body: JSON.stringify(data ?? {}) }),
+
+  updateWriting: (id: number, data: { title?: string; content?: string }) =>
+    request<Writing>(`/api/writings/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+
+  deleteWriting: (id: number) =>
+    request<{ ok: boolean }>(`/api/writings/${id}`, { method: "DELETE" }),
 
   listSessions: (bookId?: number) =>
     request<ReadingSession[]>(`/api/reading/sessions${bookId ? `?bookId=${bookId}` : ""}`),

@@ -29,6 +29,8 @@ import Timeline from "./pages/Timeline";
 import Leer from "./pages/Leer";
 import LeerSesion from "./pages/LeerSesion";
 import Apariencia from "./pages/Apariencia";
+import Escribir from "./pages/Escribir";
+import EscribirEditor from "./pages/EscribirEditor";
 import Stub from "./pages/Stub";
 
 /** Rutas para los atajos Cmd+1..6. */
@@ -102,8 +104,8 @@ export default function App() {
               <Route path="/calendario/mes" element={<Calendario />} />
               <Route path="/inspiracion" element={<Inspiracion />} />
               <Route path="/constelacion" element={<Stub title="Constelación" note="Grafo de conexiones — Parte C." />} />
-              <Route path="/escribir" element={<Stub title="Escribir" note="Editor de escritura libre — Parte C." />} />
-              <Route path="/escribir/:id" element={<Stub title="Escribir" note="Parte C." />} />
+              <Route path="/escribir" element={<Escribir />} />
+              <Route path="/escribir/:id" element={<EscribirEditor />} />
               <Route path="/recursos" element={<Recursos />} />
               <Route path="/tiktok" element={<TikTok />} />
               <Route path="/ideas" element={<Ideas />} />

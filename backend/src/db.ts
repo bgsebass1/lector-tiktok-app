@@ -279,6 +279,15 @@ export function initDb(): void {
       created_at TEXT DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE SET NULL
     );
+
+    /* ---- Módulo: Escribir (escritura libre) ---- */
+    CREATE TABLE IF NOT EXISTS writings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL DEFAULT 'Sin título',
+      content TEXT NOT NULL DEFAULT '',
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT
+    );
   `);
 
   console.log("✅ Base de datos lista (~/.pliego/data.db).");
