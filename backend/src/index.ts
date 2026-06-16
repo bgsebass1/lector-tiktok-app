@@ -29,6 +29,7 @@ import { readingRouter } from "./routes/reading.js";
 import { writingsRouter } from "./routes/writings.js";
 import { wishlistRouter } from "./routes/wishlist.js";
 import { constelacionRouter } from "./routes/constelacion.js";
+import { shuffleRouter } from "./routes/shuffle.js";
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 3001);
@@ -69,6 +70,7 @@ app.use("/api/reading", readingRouter);
 app.use("/api/writings", writingsRouter);
 app.use("/api/wishlist", wishlistRouter);
 app.use("/api/constelacion", constelacionRouter);
+app.use("/api/shuffle", shuffleRouter);
 
 
 app.listen(PORT, () => {

@@ -31,6 +31,7 @@ export const drawerSections: NavSection[] = [
     items: [
       { label: "Inspiración", to: "/inspiracion", icon: "💡" },
       { label: "Modo monje", to: "/monje", icon: "🧘" },
+      { label: "Shuffle creativo", to: "/shuffle", icon: "🎲" },
       { label: "Constelación", to: "/constelacion", icon: "🕸️" },
       { label: "Escribir", to: "/escribir", icon: "✒️" },
       { label: "Recursos B-roll", to: "/recursos", icon: "🎬" },

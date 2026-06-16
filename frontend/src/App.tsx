@@ -34,6 +34,7 @@ import EscribirEditor from "./pages/EscribirEditor";
 import QuieroLeer from "./pages/QuieroLeer";
 import Constelacion from "./pages/Constelacion";
 import Monje from "./pages/Monje";
+import Shuffle from "./pages/Shuffle";
 import Stub from "./pages/Stub";
 
 /** Rutas para los atajos Cmd+1..6. */
@@ -109,6 +110,7 @@ export default function App() {
               <Route path="/inspiracion" element={<Inspiracion />} />
               <Route path="/constelacion" element={<Constelacion />} />
               <Route path="/monje" element={<Monje />} />
+              <Route path="/shuffle" element={<Shuffle />} />
               <Route path="/escribir" element={<Escribir />} />
               <Route path="/escribir/:id" element={<EscribirEditor />} />
               <Route path="/recursos" element={<Recursos />} />

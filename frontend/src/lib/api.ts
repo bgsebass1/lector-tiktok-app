@@ -394,6 +394,15 @@ export interface Highlight {
   created_at: string;
 }
 
+/* ---------- Shuffle creativo ---------- */
+
+export interface ShuffleDraw {
+  book: { id: number; title: string; author: string } | null;
+  quote: { id: number; text: string; source: string | null } | null;
+  word: { id: number; word: string; etymology: string | null } | null;
+  idea: { id: number; topic: string } | null;
+}
+
 /* ---------- Constelación ---------- */
 
 export interface GraphNode {
@@ -592,6 +601,12 @@ export const api = {
   readingStats: () => request<ReadingStats>("/api/reading/stats"),
 
   readingHeatmap: () => request<Array<{ d: string; m: number }>>("/api/reading/heatmap"),
+
+  // --- Shuffle creativo ---
+  shuffle: () => request<ShuffleDraw>("/api/shuffle"),
+
+  shuffleSpark: (draw: ShuffleDraw) =>
+    request<{ spark: string }>("/api/shuffle/spark", { method: "POST", body: JSON.stringify(draw) }),
 
   // --- Constelación ---
   getConstelacion: () => request<GraphData>("/api/constelacion"),
