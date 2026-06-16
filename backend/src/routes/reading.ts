@@ -21,8 +21,37 @@ readingRouter.get("/stats", (_req: Request, res: Response) => {
       "SELECT COALESCE(SUM(minutes),0) totalMinutes, COUNT(*) totalSessions, COUNT(DISTINCT book_id) booksTouched FROM reading_sessions"
     )
     .get() as { totalMinutes: number; totalSessions: number; booksTouched: number };
-  res.json(row);
+
+  // Racha: días consecutivos (hasta hoy o ayer) con al menos una sesión.
+  const dates = (
+    db.prepare("SELECT DISTINCT date(created_at) d FROM reading_sessions ORDER BY d DESC").all() as Array<{ d: string }>
+  ).map((r) => r.d);
+  const streak = computeStreak(dates);
+
+  res.json({ ...row, streak });
 });
+
+/**
+ * Cuenta días consecutivos terminando hoy o ayer (tolera no haber leído aún hoy).
+ * Usa fechas UTC para coincidir con date(created_at) de SQLite (que es UTC).
+ */
+function computeStreak(datesDesc: string[]): number {
+  if (datesDesc.length === 0) return 0;
+  const set = new Set(datesDesc);
+  const fmt = (dt: Date) => dt.toISOString().slice(0, 10);
+
+  const cursor = new Date();
+  cursor.setUTCHours(0, 0, 0, 0);
+  // Empezamos hoy; si hoy no hay, probamos ayer (la racha sigue viva).
+  if (!set.has(fmt(cursor))) cursor.setUTCDate(cursor.getUTCDate() - 1);
+
+  let streak = 0;
+  while (set.has(fmt(cursor))) {
+    streak++;
+    cursor.setUTCDate(cursor.getUTCDate() - 1);
+  }
+  return streak;
+}
 
 /* ---------- Heatmap anual ---------- */
 readingRouter.get("/heatmap", (_req: Request, res: Response) => {

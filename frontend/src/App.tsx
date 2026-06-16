@@ -7,6 +7,7 @@ import AppShell from "./components/shell/AppShell";
 import CommandPalette from "./components/CommandPalette";
 import RadialMenu from "./components/RadialMenu";
 import InstallPrompt from "./components/InstallPrompt";
+import DailyRitual from "./components/DailyRitual";
 import PageTransition from "./components/PageTransition";
 
 import Dashboard from "./pages/Dashboard";
@@ -140,6 +141,9 @@ export default function App() {
       <div className="hidden md:block">
         <RadialMenu open={radialOpen} setOpen={setRadialOpen} />
       </div>
+
+      {/* Ritual diario: bienvenida una vez al día. */}
+      <DailyRitual />
 
       {/* Banner para instalar la PWA (iOS/Android). */}
       <InstallPrompt />

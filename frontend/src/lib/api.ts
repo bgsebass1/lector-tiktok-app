@@ -382,6 +382,7 @@ export interface ReadingStats {
   totalMinutes: number;
   totalSessions: number;
   booksTouched: number;
+  streak: number;
 }
 
 export interface Highlight {

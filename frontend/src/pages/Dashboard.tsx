@@ -55,6 +55,20 @@ export default function Dashboard() {
   const booksThisYear = books.filter((b) => (b.read_date ?? b.created_at).startsWith(String(thisYear))).length;
   const published = pipeline.filter((c) => c.status === "publicado").length;
 
+  // Intención del día (la fija el ritual diario; se guarda en localStorage).
+  let todayIntention = "";
+  try {
+    const raw = localStorage.getItem("pliego_intention");
+    if (raw) {
+      const obj = JSON.parse(raw);
+      const t = new Date();
+      const today = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
+      if (obj.date === today) todayIntention = obj.text;
+    }
+  } catch {
+    /* ignore */
+  }
+
   return (
     <div>
       {/* Saludo */}
@@ -63,6 +77,11 @@ export default function Dashboard() {
           {greeting()}, Sebastian <span className="text-gold">😁</span>
         </h1>
         <p className="mt-2 font-serif text-xl text-muted">¿Qué vamos a crear hoy?</p>
+        {todayIntention && (
+          <p className="mt-3 inline-block rounded-lg border border-gold/30 bg-gold/5 px-3 py-1.5 text-sm text-gold">
+            ✦ Intención de hoy: <span className="text-cream">{todayIntention}</span>
+          </p>
+        )}
       </section>
 
       {/* Stats rápidas */}
