@@ -38,6 +38,9 @@ import Constelacion from "./pages/Constelacion";
 import Monje from "./pages/Monje";
 import Shuffle from "./pages/Shuffle";
 import Sonidos from "./pages/Sonidos";
+import Configuracion from "./pages/Configuracion";
+import Backup from "./pages/Backup";
+import Atajos from "./pages/Atajos";
 import Stub from "./pages/Stub";
 
 /** Rutas para los atajos Cmd+1..6. */
@@ -123,11 +126,11 @@ export default function App() {
 
               {/* Identidad / configuración */}
               <Route path="/branding" element={<Branding />} />
-              <Route path="/settings" element={<Stub title="Configuración" note="Ajustes generales — Parte E." />} />
+              <Route path="/settings" element={<Configuracion />} />
               <Route path="/settings/apariencia" element={<Apariencia />} />
               <Route path="/settings/sonidos" element={<Sonidos />} />
-              <Route path="/settings/backup" element={<Stub title="Backup" note="Exportar / importar tus datos — Parte E." />} />
-              <Route path="/settings/atajos" element={<Stub title="Atajos de teclado" note="Parte E." />} />
+              <Route path="/settings/backup" element={<Backup />} />
+              <Route path="/settings/atajos" element={<Atajos />} />
               <Route path="/onboarding" element={<Stub title="Bienvenido a Pliego" note="Flujo de primera vez — Parte E." />} />
 
               {/* Cualquier otra ruta vuelve al inicio. */}

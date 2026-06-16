@@ -395,6 +395,15 @@ export interface Highlight {
   created_at: string;
 }
 
+/* ---------- Backup / restore ---------- */
+
+export interface BackupFile {
+  exported_at: string;
+  app: string;
+  version: number;
+  data: Record<string, unknown[]>;
+}
+
 /* ---------- Shuffle creativo ---------- */
 
 export interface ShuffleDraw {
@@ -781,4 +790,10 @@ export const api = {
 
   // --- Transversal: búsqueda global ---
   search: (q: string) => request<SearchResult[]>(`/api/search?q=${encodeURIComponent(q)}`),
+
+  // --- Backup / restore ---
+  getBackup: () => request<BackupFile>("/api/backup"),
+
+  restore: (data: Record<string, unknown[]>) =>
+    request<{ ok: boolean }>("/api/restore", { method: "POST", body: JSON.stringify({ data }) }),
 };
