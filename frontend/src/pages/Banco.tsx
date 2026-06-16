@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, type Note } from "../lib/api";
-import { notifyOk, notifyGrokError } from "../lib/notify";
+import { notifyOk, notifyError, notifyGrokError } from "../lib/notify";
 
 /** Categorías con su color (fijos, para distinguir de un vistazo). */
 export const CATS: Record<string, { label: string; dot: string; text: string; border: string; chip: string }> = {
@@ -109,17 +109,7 @@ function NoteModal({ note, onClose, onChange }: { note: Note | null; onClose: ()
 
   const c = CATS[category] ?? CATS.otro;
 
-  async function ensureSaved(): Promise<number | null> {
-    if (!title.trim() && !content.trim()) {
-      notifyGrokError(new Error("Escribe algo antes."));
-      return null;
-    }
-    if (id) {
-      const u = await api.updateNote(id, { title, content, category });
-      setData(u);
-      onChange();
-      return id;
-    }
+  async function create(): Promise<number> {
     const created = await api.createNote({ title: title || "Sin título", content, category });
     setId(created.id);
     setData(created);
@@ -127,13 +117,31 @@ function NoteModal({ note, onClose, onChange }: { note: Note | null; onClose: ()
     return created.id;
   }
 
+  async function ensureSaved(): Promise<number | null> {
+    if (!title.trim() && !content.trim()) {
+      notifyError(new Error("Escribe algo antes de guardar."));
+      return null;
+    }
+    if (!id) return create();
+    try {
+      const u = await api.updateNote(id, { title, content, category });
+      setData(u);
+      onChange();
+      return id;
+    } catch (e) {
+      // Si la nota fue borrada en otro lado, la recreamos para no perder el texto.
+      if (e instanceof Error && /no encontrada|404/i.test(e.message)) return create();
+      throw e;
+    }
+  }
+
   async function save() {
     setBusy("save");
     try {
-      await ensureSaved();
-      notifyOk("Guardado.");
+      const nid = await ensureSaved();
+      if (nid) notifyOk("Guardado.");
     } catch (e) {
-      notifyGrokError(e);
+      notifyError(e);
     } finally {
       setBusy(null);
     }
@@ -180,7 +188,7 @@ function NoteModal({ note, onClose, onChange }: { note: Note | null; onClose: ()
         <div className="mt-3 flex flex-wrap gap-2">
           <button onClick={save} disabled={!!busy} className="btn-gold">{busy === "save" ? "Guardando…" : "Guardar"}</button>
           {id && (
-            <button onClick={async () => { await api.deleteNote(id); onChange(); onClose(); }} className="btn-ghost text-rose-300">Borrar</button>
+            <button onClick={async () => { try { await api.deleteNote(id); } catch { /* ya no existe */ } onChange(); onClose(); }} className="btn-ghost text-rose-300">Borrar</button>
           )}
         </div>
 
