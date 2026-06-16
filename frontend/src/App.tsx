@@ -33,6 +33,7 @@ import Escribir from "./pages/Escribir";
 import EscribirEditor from "./pages/EscribirEditor";
 import QuieroLeer from "./pages/QuieroLeer";
 import Constelacion from "./pages/Constelacion";
+import Monje from "./pages/Monje";
 import Stub from "./pages/Stub";
 
 /** Rutas para los atajos Cmd+1..6. */
@@ -107,6 +108,7 @@ export default function App() {
               <Route path="/calendario/mes" element={<Calendario />} />
               <Route path="/inspiracion" element={<Inspiracion />} />
               <Route path="/constelacion" element={<Constelacion />} />
+              <Route path="/monje" element={<Monje />} />
               <Route path="/escribir" element={<Escribir />} />
               <Route path="/escribir/:id" element={<EscribirEditor />} />
               <Route path="/recursos" element={<Recursos />} />
