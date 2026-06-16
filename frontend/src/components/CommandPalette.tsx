@@ -22,6 +22,7 @@ const TYPE_META: Record<SearchResult["type"], { label: string; icon: string }> =
   recurso: { label: "Recursos", icon: "🎞️" },
   evento: { label: "Timeline", icon: "📜" },
   deseo: { label: "Quiero leer", icon: "🔖" },
+  nota: { label: "Banco de ideas", icon: "🧠" },
 };
 
 /**

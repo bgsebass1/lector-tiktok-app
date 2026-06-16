@@ -42,6 +42,7 @@ import Configuracion from "./pages/Configuracion";
 import Backup from "./pages/Backup";
 import Atajos from "./pages/Atajos";
 import Coleccion from "./pages/Coleccion";
+import Banco from "./pages/Banco";
 import Stub from "./pages/Stub";
 
 /** Rutas para los atajos Cmd+1..6. */
@@ -118,6 +119,7 @@ export default function App() {
               <Route path="/constelacion" element={<Constelacion />} />
               <Route path="/monje" element={<Monje />} />
               <Route path="/shuffle" element={<Shuffle />} />
+              <Route path="/banco" element={<Banco />} />
               <Route path="/escribir" element={<Escribir />} />
               <Route path="/escribir/:id" element={<EscribirEditor />} />
               <Route path="/recursos" element={<Recursos />} />

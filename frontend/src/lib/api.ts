@@ -205,7 +205,8 @@ export interface SearchResult {
     | "dialogo"
     | "recurso"
     | "evento"
-    | "deseo";
+    | "deseo"
+    | "nota";
   id: number;
   title: string;
   subtitle?: string;
@@ -393,6 +394,22 @@ export interface Highlight {
   note: string | null;
   page: number | null;
   created_at: string;
+}
+
+/* ---------- Banco de ideas ---------- */
+
+export interface Note {
+  id: number;
+  title: string;
+  content: string;
+  category: string;
+  score: number | null;
+  score_reason: string | null; // JSON: { veredicto, fuerte, mejora }
+  score_detail: string | null; // JSON: { originalidad, claridad, factibilidad, potencial, profundidad }
+  structured: string | null;
+  research: string | null;
+  created_at: string;
+  updated_at: string | null;
 }
 
 /* ---------- Backup / restore ---------- */
@@ -790,6 +807,23 @@ export const api = {
 
   // --- Transversal: búsqueda global ---
   search: (q: string) => request<SearchResult[]>(`/api/search?q=${encodeURIComponent(q)}`),
+
+  // --- Banco de ideas ---
+  listNotes: (category?: string) =>
+    request<Note[]>(`/api/notes${category ? `?category=${encodeURIComponent(category)}` : ""}`),
+
+  createNote: (data: { title: string; content: string; category: string }) =>
+    request<Note>("/api/notes", { method: "POST", body: JSON.stringify(data) }),
+
+  updateNote: (id: number, data: { title?: string; content?: string; category?: string }) =>
+    request<Note>(`/api/notes/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+
+  deleteNote: (id: number) =>
+    request<{ ok: boolean }>(`/api/notes/${id}`, { method: "DELETE" }),
+
+  rateNote: (id: number) => request<Note>(`/api/notes/${id}/rate`, { method: "POST" }),
+  structureNote: (id: number) => request<Note>(`/api/notes/${id}/structure`, { method: "POST" }),
+  researchNote: (id: number) => request<Note>(`/api/notes/${id}/research`, { method: "POST" }),
 
   // --- Backup / restore ---
   getBackup: () => request<BackupFile>("/api/backup"),

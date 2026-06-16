@@ -300,6 +300,21 @@ export function initDb(): void {
       source TEXT NOT NULL DEFAULT 'manual',
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
+
+    /* ---- Módulo: Banco de ideas (notas categorizadas + IA) ---- */
+    CREATE TABLE IF NOT EXISTS notes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL DEFAULT '',
+      content TEXT NOT NULL DEFAULT '',
+      category TEXT NOT NULL DEFAULT 'otro',
+      score REAL,            -- nota global (promedio de criterios)
+      score_reason TEXT,     -- veredicto + fuerte + mejora (JSON)
+      score_detail TEXT,     -- criterios por separado (JSON)
+      structured TEXT,       -- versión reestructurada por IA
+      research TEXT,         -- sugerencias de investigación por IA
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT
+    );
   `);
 
   console.log("✅ Base de datos lista (~/.pliego/data.db).");

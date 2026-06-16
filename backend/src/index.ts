@@ -30,6 +30,7 @@ import { writingsRouter } from "./routes/writings.js";
 import { wishlistRouter } from "./routes/wishlist.js";
 import { constelacionRouter } from "./routes/constelacion.js";
 import { shuffleRouter } from "./routes/shuffle.js";
+import { notesRouter } from "./routes/notes.js";
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 3001);
@@ -71,6 +72,7 @@ app.use("/api/writings", writingsRouter);
 app.use("/api/wishlist", wishlistRouter);
 app.use("/api/constelacion", constelacionRouter);
 app.use("/api/shuffle", shuffleRouter);
+app.use("/api/notes", notesRouter);
 
 
 app.listen(PORT, () => {
