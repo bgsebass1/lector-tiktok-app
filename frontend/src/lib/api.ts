@@ -204,7 +204,8 @@ export interface SearchResult {
     | "flashcard"
     | "dialogo"
     | "recurso"
-    | "evento";
+    | "evento"
+    | "deseo";
   id: number;
   title: string;
   subtitle?: string;
@@ -393,6 +394,19 @@ export interface Highlight {
   created_at: string;
 }
 
+/* ---------- Quiero leer (lista de deseos) ---------- */
+
+export interface WishItem {
+  id: number;
+  title: string;
+  author: string;
+  reason: string | null;
+  cover_url: string | null;
+  priority: number;
+  source: string;
+  created_at: string;
+}
+
 /* ---------- Escribir ---------- */
 
 export interface Writing {
@@ -559,6 +573,21 @@ export const api = {
   readingStats: () => request<ReadingStats>("/api/reading/stats"),
 
   readingHeatmap: () => request<Array<{ d: string; m: number }>>("/api/reading/heatmap"),
+
+  // --- Quiero leer ---
+  listWishlist: () => request<WishItem[]>("/api/wishlist"),
+
+  addWish: (data: { title: string; author: string; reason?: string; cover_url?: string; source?: string }) =>
+    request<WishItem>("/api/wishlist", { method: "POST", body: JSON.stringify(data) }),
+
+  moveWish: (id: number, dir: "up" | "down") =>
+    request<{ ok: boolean }>(`/api/wishlist/${id}/move?dir=${dir}`, { method: "POST" }),
+
+  promoteWish: (id: number) =>
+    request<Book>(`/api/wishlist/${id}/promote`, { method: "POST" }),
+
+  deleteWish: (id: number) =>
+    request<{ ok: boolean }>(`/api/wishlist/${id}`, { method: "DELETE" }),
 
   // --- Escribir ---
   listWritings: () => request<WritingSummary[]>("/api/writings"),

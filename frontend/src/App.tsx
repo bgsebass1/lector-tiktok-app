@@ -31,6 +31,7 @@ import LeerSesion from "./pages/LeerSesion";
 import Apariencia from "./pages/Apariencia";
 import Escribir from "./pages/Escribir";
 import EscribirEditor from "./pages/EscribirEditor";
+import QuieroLeer from "./pages/QuieroLeer";
 import Stub from "./pages/Stub";
 
 /** Rutas para los atajos Cmd+1..6. */
@@ -80,6 +81,7 @@ export default function App() {
               <Route path="/libros/:id" element={<Stub title="Detalle del libro" note="Highlights y sesiones del libro — llega en la Parte B." />} />
               <Route path="/leer" element={<Leer />} />
               <Route path="/leer/:bookId" element={<LeerSesion />} />
+              <Route path="/quiero-leer" element={<QuieroLeer />} />
 
               {/* Estudio */}
               <Route path="/estudio" element={<EstudioHub />} />

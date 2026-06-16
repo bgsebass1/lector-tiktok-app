@@ -288,6 +288,18 @@ export function initDb(): void {
       created_at TEXT DEFAULT CURRENT_TIMESTAMP,
       updated_at TEXT
     );
+
+    /* ---- Módulo: Quiero leer (lista de deseos / TBR) ---- */
+    CREATE TABLE IF NOT EXISTS wishlist (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      author TEXT NOT NULL,
+      reason TEXT,
+      cover_url TEXT,
+      priority INTEGER NOT NULL DEFAULT 0,
+      source TEXT NOT NULL DEFAULT 'manual',
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
   `);
 
   console.log("✅ Base de datos lista (~/.pliego/data.db).");

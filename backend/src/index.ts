@@ -27,6 +27,7 @@ import { resourcesRouter } from "./routes/resources.js";
 import { timelineRouter } from "./routes/timeline.js";
 import { readingRouter } from "./routes/reading.js";
 import { writingsRouter } from "./routes/writings.js";
+import { wishlistRouter } from "./routes/wishlist.js";
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 3001);
@@ -65,6 +66,7 @@ app.use("/api/resources", resourcesRouter);
 app.use("/api/timeline", timelineRouter);
 app.use("/api/reading", readingRouter);
 app.use("/api/writings", writingsRouter);
+app.use("/api/wishlist", wishlistRouter);
 
 
 app.listen(PORT, () => {

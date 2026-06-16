@@ -10,7 +10,7 @@ import { db } from "../db.js";
 export const searchRouter = Router();
 
 export interface SearchResult {
-  type: "libro" | "cita" | "palabra" | "idea" | "guion" | "escrito" | "highlight" | "flashcard" | "dialogo" | "recurso" | "evento";
+  type: "libro" | "cita" | "palabra" | "idea" | "guion" | "escrito" | "highlight" | "flashcard" | "dialogo" | "recurso" | "evento" | "deseo";
   id: number;
   title: string;
   subtitle?: string;
@@ -102,6 +102,13 @@ searchRouter.get("/", (req, res) => {
     .prepare("SELECT id, title, type FROM resources WHERE title LIKE ? OR tags LIKE ? OR mood LIKE ? LIMIT 5")
     .all(like, like, like) as Array<{ id: number; title: string; type: string }>) {
     results.push({ type: "recurso", id: r.id, title: r.title, subtitle: r.type, to: "/recursos" });
+  }
+
+  // Quiero leer (lista de deseos)
+  for (const d of db
+    .prepare("SELECT id, title, author FROM wishlist WHERE title LIKE ? OR author LIKE ? LIMIT 5")
+    .all(like, like) as Array<{ id: number; title: string; author: string }>) {
+    results.push({ type: "deseo", id: d.id, title: d.title, subtitle: d.author, to: "/quiero-leer" });
   }
 
   // Eventos del timeline

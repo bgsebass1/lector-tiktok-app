@@ -19,6 +19,7 @@ export const drawerSections: NavSection[] = [
     title: "Tu lectura",
     items: [
       { label: "Leer", to: "/leer", icon: "📖" },
+      { label: "Quiero leer", to: "/quiero-leer", icon: "🔖" },
       { label: "Calendario", to: "/calendario", icon: "📅" },
       { label: "Diálogos", to: "/dialogos", icon: "💭" },
       { label: "Flashcards", to: "/flashcards", icon: "🗂️" },
