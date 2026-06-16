@@ -42,6 +42,7 @@ export default function DailyRitual() {
   const [intention, setIntention] = useState("");
 
   useEffect(() => {
+    if (localStorage.getItem("pliego_onboarded") !== "1") return; // primero el onboarding
     if (localStorage.getItem(KEY_DATE) === todayStr()) return; // ya se vio hoy
     api.readingStats().then((s) => setStreak(s.streak)).catch(() => setStreak(0));
     setOpen(true);

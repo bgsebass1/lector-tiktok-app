@@ -8,6 +8,7 @@ import CommandPalette from "./components/CommandPalette";
 import RadialMenu from "./components/RadialMenu";
 import InstallPrompt from "./components/InstallPrompt";
 import DailyRitual from "./components/DailyRitual";
+import Onboarding from "./components/Onboarding";
 import PageTransition from "./components/PageTransition";
 
 import Dashboard from "./pages/Dashboard";
@@ -141,6 +142,9 @@ export default function App() {
       <div className="hidden md:block">
         <RadialMenu open={radialOpen} setOpen={setRadialOpen} />
       </div>
+
+      {/* Onboarding de primera vez (se muestra antes que el ritual). */}
+      <Onboarding />
 
       {/* Ritual diario: bienvenida una vez al día. */}
       <DailyRitual />
