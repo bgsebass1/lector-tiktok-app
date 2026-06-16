@@ -394,6 +394,25 @@ export interface Highlight {
   created_at: string;
 }
 
+/* ---------- Constelación ---------- */
+
+export interface GraphNode {
+  id: string;
+  type: "libro" | "tema";
+  label: string;
+  bookId?: number;
+  degree: number;
+}
+export interface GraphLink {
+  source: string;
+  target: string;
+  kind: "tema" | "autor";
+}
+export interface GraphData {
+  nodes: GraphNode[];
+  links: GraphLink[];
+}
+
 /* ---------- Quiero leer (lista de deseos) ---------- */
 
 export interface WishItem {
@@ -573,6 +592,9 @@ export const api = {
   readingStats: () => request<ReadingStats>("/api/reading/stats"),
 
   readingHeatmap: () => request<Array<{ d: string; m: number }>>("/api/reading/heatmap"),
+
+  // --- Constelación ---
+  getConstelacion: () => request<GraphData>("/api/constelacion"),
 
   // --- Quiero leer ---
   listWishlist: () => request<WishItem[]>("/api/wishlist"),

@@ -32,6 +32,7 @@ import Apariencia from "./pages/Apariencia";
 import Escribir from "./pages/Escribir";
 import EscribirEditor from "./pages/EscribirEditor";
 import QuieroLeer from "./pages/QuieroLeer";
+import Constelacion from "./pages/Constelacion";
 import Stub from "./pages/Stub";
 
 /** Rutas para los atajos Cmd+1..6. */
@@ -105,7 +106,7 @@ export default function App() {
               <Route path="/calendario" element={<Calendario />} />
               <Route path="/calendario/mes" element={<Calendario />} />
               <Route path="/inspiracion" element={<Inspiracion />} />
-              <Route path="/constelacion" element={<Stub title="Constelación" note="Grafo de conexiones — Parte C." />} />
+              <Route path="/constelacion" element={<Constelacion />} />
               <Route path="/escribir" element={<Escribir />} />
               <Route path="/escribir/:id" element={<EscribirEditor />} />
               <Route path="/recursos" element={<Recursos />} />
