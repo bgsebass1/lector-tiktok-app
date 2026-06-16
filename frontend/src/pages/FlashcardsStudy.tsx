@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { api, type Flashcard } from "../lib/api";
 import { notifyGrokError } from "../lib/notify";
+import { confetti } from "../lib/confetti";
 
 /**
  * MODO ESTUDIO de flashcards.
@@ -29,6 +30,15 @@ export default function FlashcardsStudy() {
 
   const card = cards[index];
   const total = useMemo(() => cards.length, [cards]);
+
+  // Celebración una sola vez al terminar la sesión.
+  const celebrated = useRef(false);
+  useEffect(() => {
+    if (loaded && total > 0 && index >= total && !celebrated.current) {
+      celebrated.current = true;
+      confetti();
+    }
+  }, [loaded, index, total]);
 
   async function rate(quality: "dificil" | "bien" | "facil") {
     if (!card) return;

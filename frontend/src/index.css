@@ -86,6 +86,15 @@
            transition hover:border-gold hover:text-gold;
   }
 
+  /* Feedback táctil global: los botones se "hunden" levemente al pulsar (mejora F). */
+  .btn-gold,
+  .btn-ghost {
+    @apply active:scale-95;
+  }
+  .card {
+    @apply transition-transform;
+  }
+
   /* Campo de texto. */
   .input {
     @apply w-full bg-carbon border border-border rounded-lg px-4 py-2.5

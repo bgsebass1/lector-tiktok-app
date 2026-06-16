@@ -8,6 +8,7 @@ import {
   type Quote,
   type Word,
 } from "../lib/api";
+import CountUp from "../components/CountUp";
 
 /**
  * DASHBOARD PRINCIPAL (Módulo 11).
@@ -184,7 +185,7 @@ function StatBox({ label, value }: { label: string; value: number }) {
   return (
     <div className="card p-5">
       <p className="text-sm text-muted">{label}</p>
-      <p className="stat mt-1 text-3xl text-gold">{value}</p>
+      <CountUp value={value} className="stat mt-1 block text-3xl text-gold" />
     </div>
   );
 }

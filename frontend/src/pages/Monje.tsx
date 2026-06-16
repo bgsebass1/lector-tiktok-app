@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { api } from "../lib/api";
 import { notifyOk } from "../lib/notify";
 import { playChime } from "../lib/sound";
+import { confetti } from "../lib/confetti";
 
 type Phase = "setup" | "focus" | "done";
 
@@ -60,6 +61,7 @@ export default function Monje() {
     const minutes = Math.max(1, Math.round(elapsed / 60));
     setPhase("done");
     playChime();
+    confetti();
     try {
       await api.createSession({ book_id: null, minutes, note: intention.trim() || "Modo monje" });
       notifyOk(`${minutes} min de concentración registrados.`);
