@@ -41,6 +41,7 @@ import Sonidos from "./pages/Sonidos";
 import Configuracion from "./pages/Configuracion";
 import Backup from "./pages/Backup";
 import Atajos from "./pages/Atajos";
+import Coleccion from "./pages/Coleccion";
 import Stub from "./pages/Stub";
 
 /** Rutas para los atajos Cmd+1..6. */
@@ -122,7 +123,7 @@ export default function App() {
               <Route path="/recursos" element={<Recursos />} />
               <Route path="/tiktok" element={<TikTok />} />
               <Route path="/ideas" element={<Ideas />} />
-              <Route path="/coleccion" element={<Stub title="Colección" note="Cartas coleccionables de libros leídos — Parte F." />} />
+              <Route path="/coleccion" element={<Coleccion />} />
 
               {/* Identidad / configuración */}
               <Route path="/branding" element={<Branding />} />
