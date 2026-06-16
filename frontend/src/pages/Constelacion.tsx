@@ -19,14 +19,17 @@ const H = 620;
 const CX = W / 2;
 const CY = H / 2;
 
+const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+
 /**
  * CONSTELACIÓN — grafo vivo de libros y temas.
- * Simulación de fuerzas (repulsión + resortes) con nodos arrastrables.
+ * Simulación de fuerzas, nodos arrastrables, con zoom y paneo.
  */
 export default function Constelacion() {
   const [data, setData] = useState<GraphData | null>(null);
   const [, setTick] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
+  const [view, setView] = useState({ tx: 0, ty: 0, k: 1 });
   const navigate = useNavigate();
 
   const nodesRef = useRef<SimNode[]>([]);
@@ -37,7 +40,11 @@ export default function Constelacion() {
   const runningRef = useRef(false);
   const dragRef = useRef<number | null>(null);
   const movedRef = useRef(false);
+  const panRef = useRef<{ sx: number; sy: number; tx: number; ty: number } | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
+  const gRef = useRef<SVGGElement>(null);
+  const viewRef = useRef(view);
+  viewRef.current = view;
 
   useEffect(() => {
     api
@@ -53,6 +60,20 @@ export default function Constelacion() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Zoom con la rueda (listener no pasivo para poder prevenir el scroll).
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    function onWheel(e: WheelEvent) {
+      e.preventDefault();
+      const factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
+      zoomAround(e.clientX, e.clientY, factor);
+    }
+    svg.addEventListener("wheel", onWheel, { passive: false });
+    return () => svg.removeEventListener("wheel", onWheel);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
 
   function initSim(g: GraphData) {
     const n = Math.max(g.nodes.length, 1);
@@ -144,7 +165,7 @@ export default function Constelacion() {
 
     for (let i = 0; i < nodes.length; i++) {
       const N = nodes[i];
-      if (dragRef.current === i) continue; // el nodo arrastrado no se mueve solo
+      if (dragRef.current === i) continue;
       N.vx += (CX - N.x) * CENTER * a;
       N.vy += (CY - N.y) * CENTER * a;
       N.x += N.vx;
@@ -158,9 +179,10 @@ export default function Constelacion() {
     alphaRef.current *= 0.985;
   }
 
-  /* ---------- Interacción (arrastrar / seleccionar) ---------- */
+  /* ---------- Conversión de coordenadas ---------- */
 
-  function toSvg(clientX: number, clientY: number) {
+  // Pantalla -> coordenadas del viewBox del SVG (para zoom/paneo).
+  function screenToVB(clientX: number, clientY: number) {
     const svg = svgRef.current!;
     const pt = svg.createSVGPoint();
     pt.x = clientX;
@@ -169,20 +191,49 @@ export default function Constelacion() {
     if (!m) return { x: 0, y: 0 };
     return pt.matrixTransform(m.inverse());
   }
+  // Pantalla -> coordenadas locales del grupo (donde viven los nodos).
+  function screenToLocal(clientX: number, clientY: number) {
+    const g = gRef.current!;
+    const pt = (svgRef.current as SVGSVGElement).createSVGPoint();
+    pt.x = clientX;
+    pt.y = clientY;
+    const m = g.getScreenCTM();
+    if (!m) return { x: 0, y: 0 };
+    return pt.matrixTransform(m.inverse());
+  }
 
-  function onPointerDown(i: number, e: React.PointerEvent) {
+  function zoomAround(clientX: number, clientY: number, factor: number) {
+    const p = screenToVB(clientX, clientY);
+    setView((v) => {
+      const k = clamp(v.k * factor, 0.35, 4.5);
+      const ratio = k / v.k;
+      return { k, tx: p.x - ratio * (p.x - v.tx), ty: p.y - ratio * (p.y - v.ty) };
+    });
+  }
+  function zoomCenter(factor: number) {
+    setView((v) => {
+      const k = clamp(v.k * factor, 0.35, 4.5);
+      const ratio = k / v.k;
+      return { k, tx: CX - ratio * (CX - v.tx), ty: CY - ratio * (CY - v.ty) };
+    });
+  }
+
+  /* ---------- Arrastre de nodos ---------- */
+
+  function onNodeDown(i: number, e: React.PointerEvent) {
     e.preventDefault();
+    e.stopPropagation();
     dragRef.current = i;
     movedRef.current = false;
     alphaRef.current = Math.max(alphaRef.current, 0.3);
     ensureLoop();
-    window.addEventListener("pointermove", onMove);
-    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointermove", onNodeMove);
+    window.addEventListener("pointerup", onNodeUp);
   }
-  function onMove(e: PointerEvent) {
+  function onNodeMove(e: PointerEvent) {
     if (dragRef.current === null) return;
     movedRef.current = true;
-    const p = toSvg(e.clientX, e.clientY);
+    const p = screenToLocal(e.clientX, e.clientY);
     const N = nodesRef.current[dragRef.current];
     N.x = p.x;
     N.y = p.y;
@@ -191,15 +242,38 @@ export default function Constelacion() {
     alphaRef.current = Math.max(alphaRef.current, 0.15);
     ensureLoop();
   }
-  function onUp() {
+  function onNodeUp() {
     const i = dragRef.current;
     dragRef.current = null;
-    window.removeEventListener("pointermove", onMove);
-    window.removeEventListener("pointerup", onUp);
+    window.removeEventListener("pointermove", onNodeMove);
+    window.removeEventListener("pointerup", onNodeUp);
     if (!movedRef.current && i !== null) {
       const node = nodesRef.current[i];
       setSelected((s) => (s === node.id ? null : node.id));
     }
+  }
+
+  /* ---------- Paneo (arrastrar el fondo) ---------- */
+
+  function onBgDown(e: React.PointerEvent) {
+    panRef.current = { sx: e.clientX, sy: e.clientY, tx: viewRef.current.tx, ty: viewRef.current.ty };
+    movedRef.current = false;
+    window.addEventListener("pointermove", onPanMove);
+    window.addEventListener("pointerup", onPanUp);
+  }
+  function onPanMove(e: PointerEvent) {
+    const p = panRef.current;
+    if (!p) return;
+    const a = screenToVB(p.sx, p.sy);
+    const b = screenToVB(e.clientX, e.clientY);
+    if (Math.abs(e.clientX - p.sx) + Math.abs(e.clientY - p.sy) > 3) movedRef.current = true;
+    setView((v) => ({ ...v, tx: p.tx + (b.x - a.x), ty: p.ty + (b.y - a.y) }));
+  }
+  function onPanUp() {
+    panRef.current = null;
+    window.removeEventListener("pointermove", onPanMove);
+    window.removeEventListener("pointerup", onPanUp);
+    if (!movedRef.current) setSelected(null); // clic limpio en el fondo = deseleccionar
   }
 
   /* ---------- Render ---------- */
@@ -207,7 +281,6 @@ export default function Constelacion() {
   const nodes = nodesRef.current;
   const links = linksRef.current;
 
-  // Vecinos del nodo seleccionado (para resaltar).
   const neighbors = new Set<string>();
   if (selected) {
     neighbors.add(selected);
@@ -223,7 +296,7 @@ export default function Constelacion() {
       <div className="mb-4">
         <h1 className="text-4xl text-cream">Constelación</h1>
         <p className="mt-1 text-muted">
-          Tus libros y las ideas que los unen. Arrastra las estrellas; toca una para ver sus conexiones.
+          Tus libros y las ideas que los unen. Arrastra una estrella, arrastra el fondo para moverte, usa la rueda o los botones para acercar.
         </p>
       </div>
 
@@ -251,66 +324,75 @@ export default function Constelacion() {
             </div>
           )}
 
+          {/* Controles de zoom */}
+          <div className="absolute right-3 top-3 z-10 flex flex-col gap-1">
+            <button onClick={() => zoomCenter(1.25)} className="h-8 w-8 rounded-lg border border-border bg-surface/90 text-lg text-cream hover:border-gold">+</button>
+            <button onClick={() => zoomCenter(1 / 1.25)} className="h-8 w-8 rounded-lg border border-border bg-surface/90 text-lg text-cream hover:border-gold">−</button>
+            <button onClick={() => setView({ tx: 0, ty: 0, k: 1 })} className="h-8 w-8 rounded-lg border border-border bg-surface/90 text-xs text-muted hover:border-gold" title="Restablecer">⟲</button>
+          </div>
+
           <svg
             ref={svgRef}
             viewBox={`0 0 ${W} ${H}`}
-            className="h-[68vh] w-full touch-none select-none"
-            onClick={(e) => {
-              if (e.target === svgRef.current) setSelected(null);
-            }}
+            className="h-[68vh] w-full cursor-grab touch-none select-none active:cursor-grabbing"
           >
-            {/* Enlaces */}
-            {links.map((l, i) => {
-              const A = nodes[l.a];
-              const B = nodes[l.b];
-              if (!A || !B) return null;
-              const active = !selected || (neighbors.has(A.id) && neighbors.has(B.id));
-              return (
-                <line
-                  key={i}
-                  x1={A.x}
-                  y1={A.y}
-                  x2={B.x}
-                  y2={B.y}
-                  stroke={l.kind === "autor" ? "rgb(var(--gold))" : "rgb(var(--muted))"}
-                  strokeWidth={l.kind === "autor" ? 1.4 : 0.8}
-                  strokeOpacity={active ? 0.5 : 0.08}
-                />
-              );
-            })}
+            {/* Fondo para paneo / deselección */}
+            <rect x={0} y={0} width={W} height={H} fill="transparent" onPointerDown={onBgDown} />
 
-            {/* Nodos */}
-            {nodes.map((n, i) => {
-              const isBook = n.type === "libro";
-              const r = isBook ? 7 + Math.min(n.degree, 6) : 4 + Math.min(n.degree, 5);
-              const dim = selected && !neighbors.has(n.id);
-              return (
-                <g
-                  key={n.id}
-                  transform={`translate(${n.x} ${n.y})`}
-                  onPointerDown={(e) => onPointerDown(i, e)}
-                  className="cursor-pointer"
-                  opacity={dim ? 0.2 : 1}
-                >
-                  <circle
-                    r={r}
-                    fill={isBook ? "rgb(var(--gold))" : "rgb(var(--surface))"}
-                    stroke={isBook ? "rgb(var(--gold))" : "rgb(var(--muted))"}
-                    strokeWidth={1}
-                    fillOpacity={isBook ? 0.9 : 0.6}
+            <g ref={gRef} transform={`translate(${view.tx} ${view.ty}) scale(${view.k})`}>
+              {/* Enlaces */}
+              {links.map((l, i) => {
+                const A = nodes[l.a];
+                const B = nodes[l.b];
+                if (!A || !B) return null;
+                const active = !selected || (neighbors.has(A.id) && neighbors.has(B.id));
+                return (
+                  <line
+                    key={i}
+                    x1={A.x}
+                    y1={A.y}
+                    x2={B.x}
+                    y2={B.y}
+                    stroke={l.kind === "autor" ? "rgb(var(--gold))" : "rgb(var(--muted))"}
+                    strokeWidth={l.kind === "autor" ? 1.4 : 0.8}
+                    strokeOpacity={active ? 0.5 : 0.08}
                   />
-                  <text
-                    x={r + 4}
-                    y={4}
-                    fontSize={isBook ? 13 : 11}
-                    fill={isBook ? "rgb(var(--cream))" : "rgb(var(--muted))"}
-                    className="font-serif pointer-events-none"
+                );
+              })}
+
+              {/* Nodos */}
+              {nodes.map((n, i) => {
+                const isBook = n.type === "libro";
+                const r = isBook ? 7 + Math.min(n.degree, 6) : 4 + Math.min(n.degree, 5);
+                const dim = selected && !neighbors.has(n.id);
+                return (
+                  <g
+                    key={n.id}
+                    transform={`translate(${n.x} ${n.y})`}
+                    onPointerDown={(e) => onNodeDown(i, e)}
+                    className="cursor-pointer"
+                    opacity={dim ? 0.2 : 1}
                   >
-                    {n.label.length > 26 ? n.label.slice(0, 24) + "…" : n.label}
-                  </text>
-                </g>
-              );
-            })}
+                    <circle
+                      r={r}
+                      fill={isBook ? "rgb(var(--gold))" : "rgb(var(--surface))"}
+                      stroke={isBook ? "rgb(var(--gold))" : "rgb(var(--muted))"}
+                      strokeWidth={1}
+                      fillOpacity={isBook ? 0.9 : 0.6}
+                    />
+                    <text
+                      x={r + 4}
+                      y={4}
+                      fontSize={isBook ? 13 : 11}
+                      fill={isBook ? "rgb(var(--cream))" : "rgb(var(--muted))"}
+                      className="font-serif pointer-events-none"
+                    >
+                      {n.label.length > 26 ? n.label.slice(0, 24) + "…" : n.label}
+                    </text>
+                  </g>
+                );
+              })}
+            </g>
           </svg>
 
           {/* Leyenda */}
