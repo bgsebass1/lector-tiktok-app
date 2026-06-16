@@ -37,6 +37,7 @@ import QuieroLeer from "./pages/QuieroLeer";
 import Constelacion from "./pages/Constelacion";
 import Monje from "./pages/Monje";
 import Shuffle from "./pages/Shuffle";
+import Sonidos from "./pages/Sonidos";
 import Stub from "./pages/Stub";
 
 /** Rutas para los atajos Cmd+1..6. */
@@ -124,7 +125,7 @@ export default function App() {
               <Route path="/branding" element={<Branding />} />
               <Route path="/settings" element={<Stub title="Configuración" note="Ajustes generales — Parte E." />} />
               <Route path="/settings/apariencia" element={<Apariencia />} />
-              <Route path="/settings/sonidos" element={<Stub title="Sonidos" note="Sonidos de interfaz — Parte D." />} />
+              <Route path="/settings/sonidos" element={<Sonidos />} />
               <Route path="/settings/backup" element={<Stub title="Backup" note="Exportar / importar tus datos — Parte E." />} />
               <Route path="/settings/atajos" element={<Stub title="Atajos de teclado" note="Parte E." />} />
               <Route path="/onboarding" element={<Stub title="Bienvenido a Pliego" note="Flujo de primera vez — Parte E." />} />

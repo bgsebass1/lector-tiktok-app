@@ -44,6 +44,7 @@ export const drawerSections: NavSection[] = [
       { label: "Citas", to: "/citas", icon: "❝" },
       { label: "Palabras", to: "/palabras", icon: "🔤" },
       { label: "Colección", to: "/coleccion", icon: "🃏" },
+      { label: "Sonidos", to: "/settings/sonidos", icon: "🔊" },
       { label: "Configuración", to: "/settings", icon: "⚙️" },
       { label: "Backup", to: "/settings/backup", icon: "💾" },
     ],

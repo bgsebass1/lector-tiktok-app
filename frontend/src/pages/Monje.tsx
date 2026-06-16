@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { api } from "../lib/api";
 import { notifyOk } from "../lib/notify";
+import { playChime } from "../lib/sound";
 
 type Phase = "setup" | "focus" | "done";
 
@@ -53,10 +54,12 @@ export default function Monje() {
     setPhase("focus");
   }
 
+  /** Termina y REGISTRA el tiempo real transcurrido. */
   async function finish() {
     if (intervalRef.current) clearInterval(intervalRef.current);
-    const minutes = Math.max(1, Math.round((isCountdown ? target : elapsed) / 60));
+    const minutes = Math.max(1, Math.round(elapsed / 60));
     setPhase("done");
+    playChime();
     try {
       await api.createSession({ book_id: null, minutes, note: intention.trim() || "Modo monje" });
       notifyOk(`${minutes} min de concentración registrados.`);
@@ -65,12 +68,18 @@ export default function Monje() {
     }
   }
 
+  /** Sale sin registrar nada (volver atrás). */
+  function cancel() {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    navigate(-1);
+  }
+
   /* ---------- Setup ---------- */
   if (phase === "setup") {
     return (
       <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-carbon px-6">
-        <button onClick={() => navigate("/")} className="absolute right-5 top-5 text-sm text-muted hover:text-cream">
-          Salir
+        <button onClick={cancel} className="absolute right-5 top-5 text-sm text-muted hover:text-cream">
+          ← Salir
         </button>
         <div className="w-full max-w-md text-center">
           <div className="text-5xl">🧘</div>
@@ -106,7 +115,7 @@ export default function Monje() {
 
   /* ---------- Done ---------- */
   if (phase === "done") {
-    const mins = Math.max(1, Math.round((isCountdown ? target : elapsed) / 60));
+    const mins = Math.max(1, Math.round(elapsed / 60));
     return (
       <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-carbon px-6 text-center">
         <div className="text-5xl">🌿</div>
@@ -125,8 +134,8 @@ export default function Monje() {
   /* ---------- Focus ---------- */
   return (
     <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-carbon px-6">
-      <button onClick={finish} className="absolute right-5 top-5 text-sm text-muted hover:text-cream">
-        Terminar
+      <button onClick={cancel} className="absolute right-5 top-5 text-sm text-muted hover:text-cream">
+        ✕ Cancelar
       </button>
 
       {intention.trim() && (
@@ -151,9 +160,12 @@ export default function Monje() {
         </div>
       </div>
 
-      <button onClick={() => setRunning((r) => !r)} className="btn-ghost mt-10">
-        {running ? "Pausar" : "Reanudar"}
-      </button>
+      <div className="mt-10 flex items-center gap-3">
+        <button onClick={() => setRunning((r) => !r)} className="btn-ghost">
+          {running ? "Pausar" : "Reanudar"}
+        </button>
+        <button onClick={finish} className="btn-gold">Terminar y guardar</button>
+      </div>
     </div>
   );
 }
