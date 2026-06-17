@@ -25,6 +25,7 @@ export default function LeerSesion() {
   const [sessions, setSessions] = useState<ReadingSession[]>([]);
   const [highlights, setHighlights] = useState<Highlight[]>([]);
   const [showSave, setShowSave] = useState(false);
+  const [showAnalyze, setShowAnalyze] = useState(false);
   const intervalRef = useRef<number | null>(null);
 
   function loadData() {
@@ -89,7 +90,10 @@ export default function LeerSesion() {
 
       {/* Highlights */}
       <div className="mt-8">
-        <h2 className="mb-3 text-2xl text-cream">Subrayados y notas</h2>
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <h2 className="text-2xl text-cream">Subrayados y notas</h2>
+          <button onClick={() => setShowAnalyze(true)} className="btn-ghost !px-3 !py-1.5 text-sm">✨ Analizar pasaje</button>
+        </div>
         <HighlightForm bookId={id} onSaved={loadData} />
         <div className="mt-4 space-y-3">
           {highlights.map((h) => (
@@ -134,6 +138,88 @@ export default function LeerSesion() {
           onSaved={() => { setShowSave(false); setSeconds(0); loadData(); api.readingStats().catch(() => {}); }}
         />
       )}
+
+      {showAnalyze && (
+        <AnalyzeModal bookId={id} onClose={() => setShowAnalyze(false)} onSaved={loadData} />
+      )}
+    </div>
+  );
+}
+
+/* ---------- Subrayador inteligente (G11) ---------- */
+function AnalyzeModal({ bookId, onClose, onSaved }: { bookId: number; onClose: () => void; onSaved: () => void }) {
+  const [text, setText] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [res, setRes] = useState<{ subrayados: string[]; conceptos: string[]; idea_video: string; conexiones: string[] } | null>(null);
+  const [saved, setSaved] = useState<Record<number, boolean>>({});
+
+  async function run() {
+    if (!text.trim()) return;
+    setLoading(true);
+    setRes(null);
+    try {
+      setRes(await api.highlightAnalyze(text.trim()));
+    } catch (e) {
+      notifyGrokError(e);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function saveOne(i: number, frase: string) {
+    try {
+      await api.createHighlight({ book_id: bookId, text: frase });
+      setSaved((s) => ({ ...s, [i]: true }));
+      notifyOk("Subrayado guardado.");
+      onSaved();
+    } catch (e) {
+      notifyGrokError(e);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 pt-[6vh] backdrop-blur-sm" onClick={onClose}>
+      <div className="card w-full max-w-xl p-6" onClick={(e) => e.stopPropagation()}>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-2xl text-cream">Analizar un pasaje</h2>
+          <button onClick={onClose} className="text-muted hover:text-cream">✕</button>
+        </div>
+        <p className="mb-3 text-sm text-muted">Pega un párrafo del libro y la IA te propone qué subrayar, conceptos clave, una idea de video y conexiones.</p>
+        <textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="Pega aquí el pasaje…" className="input min-h-[120px] resize-y font-serif" />
+        <button onClick={run} disabled={loading || !text.trim()} className="btn-gold mt-3">{loading ? "Analizando…" : "Analizar"}</button>
+
+        {res && (
+          <div className="mt-5 space-y-4">
+            <div>
+              <div className="mb-1 text-xs uppercase tracking-wide text-muted">Para subrayar</div>
+              {res.subrayados.map((s, i) => (
+                <div key={i} className="mb-2 flex items-start justify-between gap-3 rounded-lg border border-border bg-carbon p-3">
+                  <p className="font-serif italic text-cream/90">“{s}”</p>
+                  <button onClick={() => saveOne(i, s)} disabled={saved[i]} className="shrink-0 text-sm text-gold disabled:text-muted">{saved[i] ? "✓" : "Guardar"}</button>
+                </div>
+              ))}
+            </div>
+            {res.conceptos?.length > 0 && (
+              <div>
+                <div className="mb-1 text-xs uppercase tracking-wide text-muted">Conceptos clave</div>
+                <div className="flex flex-wrap gap-2">{res.conceptos.map((c, i) => <span key={i} className="rounded-full border border-border px-2 py-0.5 text-sm text-cream/90">{c}</span>)}</div>
+              </div>
+            )}
+            {res.idea_video && (
+              <div className="rounded-lg border border-gold/40 bg-gold/5 p-3">
+                <div className="text-xs uppercase tracking-wide text-muted">🎬 Idea de video</div>
+                <p className="mt-1 text-cream">{res.idea_video}</p>
+              </div>
+            )}
+            {res.conexiones?.length > 0 && (
+              <div>
+                <div className="mb-1 text-xs uppercase tracking-wide text-muted">Conexiones</div>
+                <ul className="list-inside list-disc text-sm text-cream/90">{res.conexiones.map((c, i) => <li key={i}>{c}</li>)}</ul>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

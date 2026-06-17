@@ -47,6 +47,9 @@ import Oraculo from "./pages/Oraculo";
 import Mood from "./pages/Mood";
 import Recetario from "./pages/Recetario";
 import PalabraInmersiva from "./pages/PalabraInmersiva";
+import CadaverExquisito from "./pages/CadaverExquisito";
+import DialogosCruce from "./pages/DialogosCruce";
+import Voz from "./pages/Voz";
 import Stub from "./pages/Stub";
 
 /** Rutas para los atajos Cmd+1..6. */
@@ -128,6 +131,9 @@ export default function App() {
               <Route path="/mood" element={<Mood />} />
               <Route path="/recetario" element={<Recetario />} />
               <Route path="/palabra" element={<PalabraInmersiva />} />
+              <Route path="/cadaver-exquisito" element={<CadaverExquisito />} />
+              <Route path="/dialogos/cruce" element={<DialogosCruce />} />
+              <Route path="/voz" element={<Voz />} />
               <Route path="/escribir" element={<Escribir />} />
               <Route path="/escribir/:id" element={<EscribirEditor />} />
               <Route path="/recursos" element={<Recursos />} />

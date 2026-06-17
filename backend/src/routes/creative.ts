@@ -72,6 +72,74 @@ Genera 3 variantes del hook aplicando la fórmula a ese tema. Devuelve solo las 
   }
 });
 
+/* ---------- G2 · Cadáver exquisito ---------- */
+creativeRouter.post("/cadaver", async (req: Request, res: Response) => {
+  const fragment = String(req.body?.fragment ?? "").trim();
+  const systemPrompt =
+    "Juegas al 'cadáver exquisito' surrealista. Recibes solo un fragmento (las últimas palabras de una " +
+    "frase) y continúas con UNA sola frase evocadora, bella y un poco absurda. No expliques nada, no uses " +
+    "comillas, escribe solo la frase nueva en español.";
+  const userPrompt = `Fragmento: "${fragment || "..."}". Continúa con una sola frase:`;
+  try {
+    const text = await grokText(systemPrompt, userPrompt);
+    return res.json({ text: text.trim().replace(/^["'“]|["'”]$/g, "") });
+  } catch (err) {
+    return sendGrokError(res, err);
+  }
+});
+
+/* ---------- G2/G9 · Convertir texto en guion ---------- */
+creativeRouter.post("/to-script", async (req: Request, res: Response) => {
+  const text = String(req.body?.text ?? "").trim();
+  if (!text) return res.status(400).json({ error: "Falta el texto." });
+  const systemPrompt =
+    CHANNEL_CONTEXT + " Conviertes textos en guiones narrativos para un video corto (TikTok), en primera persona, con gancho inicial.";
+  const userPrompt = `Convierte este texto en un guion narrativo breve para un video corto (30-60s), con un gancho potente al inicio:\n\n${text}`;
+  try {
+    const script = await grokText(systemPrompt, userPrompt);
+    return res.json({ script });
+  } catch (err) {
+    return sendGrokError(res, err);
+  }
+});
+
+/* ---------- G11 · Subrayador inteligente ---------- */
+interface HighlightAnalysis {
+  subrayados: string[];
+  conceptos: string[];
+  idea_video: string;
+  conexiones: string[];
+}
+creativeRouter.post("/highlight-analyze", async (req: Request, res: Response) => {
+  const text = String(req.body?.text ?? "").trim();
+  if (!text) return res.status(400).json({ error: "Pega un pasaje del libro." });
+  const books = db.prepare("SELECT title, author FROM books ORDER BY RANDOM() LIMIT 25").all() as Array<{
+    title: string;
+    author: string;
+  }>;
+  const lista = books.map((b) => `"${b.title}"`).join(", ") || "(biblioteca vacía)";
+  const systemPrompt =
+    "Analizas pasajes de libros con ojo de lector profundo y creador de contenido. Devuelves solo JSON válido.";
+  const userPrompt = `Pasaje:
+"""${text}"""
+
+Mi biblioteca: ${lista}.
+
+Devuelve SOLO este JSON:
+{
+  "subrayados": ["3 frases textuales o casi textuales del pasaje que vale la pena subrayar"],
+  "conceptos": ["2-4 conceptos clave"],
+  "idea_video": "una idea de video corto inspirada en el pasaje",
+  "conexiones": ["1-3 conexiones con libros de mi biblioteca o autores conocidos"]
+}`;
+  try {
+    const r = await grokJson<HighlightAnalysis>(systemPrompt, userPrompt);
+    return res.json(r);
+  } catch (err) {
+    return sendGrokError(res, err);
+  }
+});
+
 /* ---------- G7 · Cita literaria de una palabra ---------- */
 creativeRouter.post("/word-quote", async (req: Request, res: Response) => {
   const word = String(req.body?.word ?? "").trim();

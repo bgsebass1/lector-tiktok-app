@@ -13,6 +13,7 @@ import { Router, type Request, type Response } from "express";
 import { db } from "../db.js";
 import { publicAuthors, getAuthor } from "../data/authors.js";
 import { dialogueWithAuthor, type DialogueMessage } from "../services/content.service.js";
+import { grokText } from "../services/grok.service.js";
 import { sendGrokError } from "./grok.js";
 
 export const dialoguesRouter = Router();
@@ -52,6 +53,28 @@ dialoguesRouter.post("/reply", async (req: Request, res: Response) => {
       history: Array.isArray(history) ? history : [],
       message: String(message),
     });
+    return res.json({ reply });
+  } catch (err) {
+    return sendGrokError(res, err);
+  }
+});
+
+/** POST /api/dialogues/cross — conversación cruzada entre dos autores (G9). */
+dialoguesRouter.post("/cross", async (req: Request, res: Response) => {
+  const { aId, bId, topic, transcript, speaker } = req.body ?? {};
+  const a = getAuthor(String(aId ?? ""));
+  const b = getAuthor(String(bId ?? ""));
+  if (!a || !b) return res.status(400).json({ error: "Autores desconocidos." });
+
+  const who = speaker === "b" ? b : a;
+  const other = speaker === "b" ? a : b;
+  const systemPrompt =
+    who.systemPrompt +
+    ` Estás en una conversación con ${other.name} sobre el tema: "${String(topic ?? "")}". ` +
+    `Respondes SOLO como ${who.name}, reaccionando a lo último que se dijo, en 2-4 frases, sin narrar acotaciones.`;
+  const userPrompt = `Conversación hasta ahora:\n${String(transcript ?? "").trim() || "(eres el primero en hablar)"}\n\nResponde como ${who.name}:`;
+  try {
+    const reply = await grokText(systemPrompt, userPrompt);
     return res.json({ reply });
   } catch (err) {
     return sendGrokError(res, err);

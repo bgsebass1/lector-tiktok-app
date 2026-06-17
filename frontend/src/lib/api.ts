@@ -844,6 +844,22 @@ export const api = {
   wordQuote: (word: string) =>
     request<{ text: string }>("/api/creative/word-quote", { method: "POST", body: JSON.stringify({ word }) }),
 
+  // --- Fase G2 ---
+  cadaver: (fragment: string) =>
+    request<{ text: string }>("/api/creative/cadaver", { method: "POST", body: JSON.stringify({ fragment }) }),
+  toScript: (text: string) =>
+    request<{ script: string }>("/api/creative/to-script", { method: "POST", body: JSON.stringify({ text }) }),
+  highlightAnalyze: (text: string) =>
+    request<{ subrayados: string[]; conceptos: string[]; idea_video: string; conexiones: string[] }>(
+      "/api/creative/highlight-analyze",
+      { method: "POST", body: JSON.stringify({ text }) }
+    ),
+  dialogueCross: (aId: string, bId: string, topic: string, transcript: string, speaker: "a" | "b") =>
+    request<{ reply: string }>("/api/dialogues/cross", {
+      method: "POST",
+      body: JSON.stringify({ aId, bId, topic, transcript, speaker }),
+    }),
+
   // --- Banco de ideas ---
   listNotes: (category?: string) =>
     request<Note[]>(`/api/notes${category ? `?category=${encodeURIComponent(category)}` : ""}`),
