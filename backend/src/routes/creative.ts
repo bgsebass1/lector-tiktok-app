@@ -140,6 +140,48 @@ Devuelve SOLO este JSON:
   }
 });
 
+/* ---------- G17 · Modo debate ---------- */
+interface DebateStart {
+  debatientes: Array<{ name: string; postura: string; apertura: string }>;
+}
+creativeRouter.post("/debate-start", async (req: Request, res: Response) => {
+  const thesis = String(req.body?.thesis ?? "").trim();
+  if (!thesis) return res.status(400).json({ error: "Escribe una tesis." });
+  const systemPrompt = "Generas debatientes con visiones distintas y argumentos sólidos. Devuelves solo JSON válido.";
+  const userPrompt = `Tesis del usuario: "${thesis}".
+Crea 3 debatientes con posturas distintas (opuestas o matizadas). Cada uno con un nombre evocador, su postura en pocas palabras y un argumento de apertura (2-3 frases) que rete al usuario.
+Devuelve SOLO:
+{ "debatientes": [ { "name": "", "postura": "", "apertura": "" } ] }`;
+  try {
+    const r = await grokJson<DebateStart>(systemPrompt, userPrompt);
+    return res.json(r);
+  } catch (err) {
+    return sendGrokError(res, err);
+  }
+});
+
+creativeRouter.post("/debate-feedback", async (req: Request, res: Response) => {
+  const thesis = String(req.body?.thesis ?? "").trim();
+  const transcript = String(req.body?.transcript ?? "").trim();
+  if (!transcript) return res.status(400).json({ error: "Falta el debate." });
+  const systemPrompt = "Evalúas la defensa argumentativa de alguien con honestidad y rigor, sin adular.";
+  const userPrompt = `Tesis: "${thesis}".
+Debate (debatientes y respuestas del usuario):
+${transcript}
+
+Evalúa SOLO la defensa del USUARIO en texto plano y breve:
+• Argumentos fuertes
+• Argumentos débiles
+• Falacias detectadas (si las hay)
+• Un consejo para mejorar`;
+  try {
+    const text = await grokText(systemPrompt, userPrompt);
+    return res.json({ text });
+  } catch (err) {
+    return sendGrokError(res, err);
+  }
+});
+
 /* ---------- G18 · Próximo paso de nicho ---------- */
 creativeRouter.post("/nicho-next", async (req: Request, res: Response) => {
   const nicho = String(req.body?.nicho ?? "").trim();

@@ -8,6 +8,12 @@ import CommandPalette from "./components/CommandPalette";
 import RadialMenu from "./components/RadialMenu";
 import InstallPrompt from "./components/InstallPrompt";
 import DailyRitual from "./components/DailyRitual";
+import RadioMini from "./components/RadioMini";
+import { RadioProvider } from "./lib/radio";
+import Radio from "./pages/Radio";
+import Antologia from "./pages/Antologia";
+import Wrapped from "./pages/Wrapped";
+import Debate from "./pages/Debate";
 import Onboarding from "./components/Onboarding";
 import PageTransition from "./components/PageTransition";
 
@@ -91,7 +97,7 @@ export default function App() {
   }, [navigate]);
 
   return (
-    <>
+    <RadioProvider>
       <AppShell onOpenSearch={() => setSearchOpen(true)}>
         {/* AnimatePresence + key por ruta = transición al cambiar de página. */}
         <AnimatePresence mode="wait">
@@ -142,6 +148,10 @@ export default function App() {
               <Route path="/influencias" element={<Influencias />} />
               <Route path="/estante" element={<Estante />} />
               <Route path="/nicho-map" element={<NichoMap />} />
+              <Route path="/radio" element={<Radio />} />
+              <Route path="/antologia" element={<Antologia />} />
+              <Route path="/wrapped" element={<Wrapped />} />
+              <Route path="/debate" element={<Debate />} />
               <Route path="/escribir" element={<Escribir />} />
               <Route path="/escribir/:id" element={<EscribirEditor />} />
               <Route path="/recursos" element={<Recursos />} />
@@ -178,6 +188,9 @@ export default function App() {
       {/* Ritual diario: bienvenida una vez al día. */}
       <DailyRitual />
 
+      {/* Mini-controles de radio (persisten en toda la app). */}
+      <RadioMini />
+
       {/* Banner para instalar la PWA (iOS/Android). */}
       <InstallPrompt />
 
@@ -195,6 +208,6 @@ export default function App() {
           error: { duration: 6000 },
         }}
       />
-    </>
+    </RadioProvider>
   );
 }

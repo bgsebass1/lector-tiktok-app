@@ -895,6 +895,15 @@ export const api = {
   deleteInfluence: (id: number) => request<{ ok: boolean }>(`/api/influences/${id}`, { method: "DELETE" }),
   expandInfluence: (id: number) => request<InflNode[]>(`/api/influences/${id}/expand`, { method: "POST" }),
 
+  // --- Debate (G17) ---
+  debateStart: (thesis: string) =>
+    request<{ debatientes: Array<{ name: string; postura: string; apertura: string }> }>(
+      "/api/creative/debate-start",
+      { method: "POST", body: JSON.stringify({ thesis }) }
+    ),
+  debateFeedback: (thesis: string, transcript: string) =>
+    request<{ text: string }>("/api/creative/debate-feedback", { method: "POST", body: JSON.stringify({ thesis, transcript }) }),
+
   // --- Nicho map (G18) ---
   nichoNext: (nicho: string) =>
     request<{ text: string }>("/api/creative/nicho-next", { method: "POST", body: JSON.stringify({ nicho }) }),
