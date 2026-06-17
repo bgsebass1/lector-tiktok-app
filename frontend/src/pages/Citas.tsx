@@ -17,6 +17,8 @@ export default function Citas() {
 
   // Cita seleccionada para exportar como imagen.
   const [exporting, setExporting] = useState<Quote | null>(null);
+  // Cita seleccionada para imprimir (PDF A4).
+  const [printing, setPrinting] = useState<Quote | null>(null);
 
   // Ideas de video generadas a partir de una cita.
   const [videoIdeas, setVideoIdeas] = useState<{ quote: Quote; ideas: QuoteVideoIdea[] } | null>(null);
@@ -102,6 +104,7 @@ export default function Citas() {
               <div className="mt-4 flex flex-wrap gap-2">
                 <button onClick={() => toVideo(q)} className="btn-ghost text-xs">🎬 A video</button>
                 <button onClick={() => setExporting(q)} className="btn-ghost text-xs">🖼️ Exportar</button>
+                <button onClick={() => setPrinting(q)} className="btn-ghost text-xs">🖨️ Imprimir</button>
                 <button onClick={() => remove(q.id)} className="text-xs text-muted hover:text-red-400">Borrar</button>
               </div>
             </div>
@@ -114,6 +117,7 @@ export default function Citas() {
         <AddQuoteModal books={books} onClose={() => setShowAdd(false)} onSaved={() => { setShowAdd(false); load(); }} />
       )}
       {exporting && <ExportModal quote={exporting} onClose={() => setExporting(null)} />}
+      {printing && <PrintModal quote={printing} onClose={() => setPrinting(null)} />}
 
       {/* Panel de ideas de video */}
       {(loadingIdeas || videoIdeas) && (
@@ -247,6 +251,72 @@ function ExportModal({ quote, onClose }: { quote: Quote; onClose: () => void }) 
         </div>
 
         <button onClick={download} className="btn-gold mt-4 w-full">Descargar PNG</button>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Print-on-demand A4 (G19) ---------- */
+
+const DESIGNS = ["minimalista", "manuscrito", "brutalista", "cartel"] as const;
+type Design = (typeof DESIGNS)[number];
+
+function PrintModal({ quote, onClose }: { quote: Quote; onClose: () => void }) {
+  const [design, setDesign] = useState<Design>("minimalista");
+  const author = quote.book_author ?? "";
+
+  const styles: Record<Design, { page: React.CSSProperties; quote: React.CSSProperties; author: React.CSSProperties }> = {
+    minimalista: {
+      page: { background: "#fff", color: "#111", justifyContent: "center", textAlign: "center", padding: "10%" },
+      quote: { fontFamily: "Cormorant Garamond, serif", fontStyle: "italic", fontSize: "3.4vw", lineHeight: 1.4 },
+      author: { marginTop: "4%", fontFamily: "Inter, sans-serif", fontSize: "1.4vw", color: "#888" },
+    },
+    manuscrito: {
+      page: { background: "#f4ecd8", color: "#3a2f1d", justifyContent: "center", textAlign: "center", padding: "12%", border: "2vw double #c9b68a", boxSizing: "border-box" },
+      quote: { fontFamily: "Cormorant Garamond, serif", fontStyle: "italic", fontSize: "3.2vw", lineHeight: 1.5 },
+      author: { marginTop: "5%", fontFamily: "Cormorant Garamond, serif", fontSize: "1.6vw", color: "#8a7a5c" },
+    },
+    brutalista: {
+      page: { background: "#fff", color: "#000", justifyContent: "flex-start", textAlign: "left", padding: "8%" },
+      quote: { fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: "5vw", lineHeight: 1.05, textTransform: "uppercase" },
+      author: { marginTop: "6%", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "1.6vw" },
+    },
+    cartel: {
+      page: { background: "radial-gradient(circle at 30% 20%, #1a1a1a, #0a0a0a)", color: "#f5f0e1", justifyContent: "flex-end", textAlign: "left", padding: "10%" },
+      quote: { fontFamily: "Playfair Display, serif", fontSize: "4vw", lineHeight: 1.2, color: "#f5f0e1" },
+      author: { marginTop: "5%", fontFamily: "Inter, sans-serif", fontSize: "1.6vw", color: "#d4af37", letterSpacing: "0.2em", textTransform: "uppercase" },
+    },
+  };
+  const s = styles[design];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/80 p-4 pt-[5vh] backdrop-blur-sm no-print" onClick={onClose}>
+      <div className="card w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-2xl text-cream">Imprimir cita</h2>
+          <button onClick={onClose} className="text-muted hover:text-cream">✕</button>
+        </div>
+        <div className="mb-4 flex flex-wrap gap-2">
+          {DESIGNS.map((d) => (
+            <button key={d} onClick={() => setDesign(d)} className={`rounded-full border px-3 py-1 text-sm capitalize ${design === d ? "border-gold text-gold" : "border-border text-muted"}`}>{d}</button>
+          ))}
+        </div>
+        {/* Vista previa A4 (ratio 1:1.414) */}
+        <div className="mx-auto w-full max-w-[280px]">
+          <div className="aspect-[1/1.414] w-full overflow-hidden rounded shadow-lg">
+            <div style={{ ...s.page, width: "100%", height: "100%", display: "flex", flexDirection: "column" }}>
+              <div style={s.quote}>“{quote.text}”</div>
+              {author && <div style={s.author}>— {author}</div>}
+            </div>
+          </div>
+        </div>
+        <button onClick={() => window.print()} className="btn-gold mt-4 w-full">🖨️ Imprimir / Guardar PDF</button>
+      </div>
+
+      {/* Página imprimible real (A4) */}
+      <div className="print-area" style={{ ...s.page, width: "100%", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+        <div style={{ ...s.quote, fontSize: design === "brutalista" ? "9vw" : design === "minimalista" || design === "manuscrito" ? "6vw" : "7vw" }}>“{quote.text}”</div>
+        {author && <div style={{ ...s.author, fontSize: "2.6vw" }}>— {author}</div>}
       </div>
     </div>
   );

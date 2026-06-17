@@ -14,6 +14,9 @@ import Radio from "./pages/Radio";
 import Antologia from "./pages/Antologia";
 import Wrapped from "./pages/Wrapped";
 import Debate from "./pages/Debate";
+import DetoxBlock from "./components/DetoxBlock";
+import { isDetox, isBlocked, detoxUntil, endDetox } from "./lib/detox";
+import { notifyOk } from "./lib/notify";
 import Onboarding from "./components/Onboarding";
 import PageTransition from "./components/PageTransition";
 
@@ -96,10 +99,22 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, [navigate]);
 
+  // Detox expirado: limpiar y dar la bienvenida de vuelta.
+  useEffect(() => {
+    const until = detoxUntil();
+    if (until && until <= Date.now()) {
+      endDetox();
+      notifyOk("Volviste. Ahora con más adentro.");
+    }
+  }, []);
+
   return (
     <RadioProvider>
       <AppShell onOpenSearch={() => setSearchOpen(true)}>
         {/* AnimatePresence + key por ruta = transición al cambiar de página. */}
+        {isDetox() && isBlocked(location.pathname) ? (
+          <DetoxBlock />
+        ) : (
         <AnimatePresence mode="wait">
           <PageTransition key={location.pathname}>
             <Routes location={location}>
@@ -173,6 +188,7 @@ export default function App() {
             </Routes>
           </PageTransition>
         </AnimatePresence>
+        )}
       </AppShell>
 
       {/* Capas globales */}

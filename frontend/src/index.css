@@ -103,7 +103,11 @@
   }
 }
 
-/* Impresión: solo se imprime .print-area, como una página de libro (G8). */
+/* Impresión: solo se imprime .print-area, como una página de libro (G8/G19). */
+@page {
+  size: A4;
+  margin: 0;
+}
 @media print {
   body {
     background: #fff !important;

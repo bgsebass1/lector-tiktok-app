@@ -112,6 +112,9 @@ export default function LeerSesion() {
         </div>
       </div>
 
+      {/* Mi recorrido (G16) */}
+      {sessions.length > 0 && <Recorrido sessions={sessions} />}
+
       {/* Sesiones del libro */}
       {sessions.length > 0 && (
         <div className="mt-8">
@@ -142,6 +145,56 @@ export default function LeerSesion() {
       {showAnalyze && (
         <AnalyzeModal bookId={id} onClose={() => setShowAnalyze(false)} onSaved={loadData} />
       )}
+    </div>
+  );
+}
+
+/* ---------- Mi recorrido / cronología (G16) ---------- */
+function Recorrido({ sessions }: { sessions: ReadingSession[] }) {
+  const sorted = [...sessions].sort((a, b) => a.created_at.localeCompare(b.created_at));
+  const first = sorted[0].created_at.slice(0, 10);
+  const last = sorted[sorted.length - 1].created_at.slice(0, 10);
+  const t0 = new Date(first).getTime();
+  const t1 = new Date(last).getTime();
+  const spanDays = Math.max(1, Math.round((t1 - t0) / 86400000) + 1);
+  const totalMin = sessions.reduce((a, s) => a + s.minutes, 0);
+  const days = new Set(sorted.map((s) => s.created_at.slice(0, 10)));
+
+  return (
+    <div className="mt-8">
+      <h2 className="mb-3 text-2xl text-cream">Mi recorrido</h2>
+      <div className="card p-5">
+        <div className="grid grid-cols-4 gap-2 text-center">
+          <Mini label="Días" value={String(spanDays)} />
+          <Mini label="Sesiones" value={String(sessions.length)} />
+          <Mini label="Tiempo" value={fmtMin(totalMin)} />
+          <Mini label="Días leídos" value={String(days.size)} />
+        </div>
+        {/* Línea de tiempo */}
+        <div className="relative mt-6 h-8">
+          <div className="absolute left-0 right-0 top-1/2 h-px bg-border" />
+          {sorted.map((s, i) => {
+            const t = new Date(s.created_at.slice(0, 10)).getTime();
+            const pct = spanDays === 1 ? 50 : ((t - t0) / (t1 - t0)) * 100;
+            return (
+              <span key={i} title={`${s.created_at.slice(0, 10)} · ${fmtMin(s.minutes)}`} className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold" style={{ left: `${pct}%` }} />
+            );
+          })}
+        </div>
+        <div className="mt-2 flex justify-between text-xs text-muted">
+          <span>{first}</span>
+          <span>{last}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Mini({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <div className="font-mono text-lg text-cream">{value}</div>
+      <div className="text-[10px] uppercase tracking-wide text-muted">{label}</div>
     </div>
   );
 }

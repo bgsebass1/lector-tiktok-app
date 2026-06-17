@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { notifyOk } from "../lib/notify";
+import { isDetox, detoxUntil, startDetox, endDetox } from "../lib/detox";
 
 interface Item {
   icon: string;
@@ -53,6 +55,9 @@ export default function Configuracion() {
         ))}
       </div>
 
+      {/* Detox */}
+      <DetoxSection />
+
       {/* Acciones */}
       <div className="mt-8">
         <h2 className="mb-3 text-sm uppercase tracking-wide text-muted">General</h2>
@@ -61,6 +66,7 @@ export default function Configuracion() {
         </button>
       </div>
 
+      {/* fin */}
       <div className="mt-10 text-center text-xs text-muted">
         <p>Pliego · tu sistema personal de lectura y creación</p>
         <a
@@ -71,6 +77,52 @@ export default function Configuracion() {
         >
           Código en GitHub ↗
         </a>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Detox mode (G20) ---------- */
+function DetoxSection() {
+  const [, force] = useState(0);
+  const active = isDetox();
+
+  function start(days: number) {
+    if (!confirm(`¿Bloquear la creación de contenido por ${days} día(s)? Solo podrás leer, escribir y guardar citas.`)) return;
+    startDetox(days);
+    force((n) => n + 1);
+  }
+  function stop() {
+    if (!confirm("¿Terminar el detox antes de tiempo?")) return;
+    endDetox();
+    force((n) => n + 1);
+  }
+
+  const ms = detoxUntil() - Date.now();
+  const days = Math.floor(ms / 86400000);
+  const hours = Math.floor((ms % 86400000) / 3600000);
+
+  return (
+    <div className="mt-8">
+      <h2 className="mb-3 text-sm uppercase tracking-wide text-muted">Detox</h2>
+      <div className="card p-5">
+        {active ? (
+          <>
+            <p className="text-cream">🧘 Estás en detox. Quedan <span className="font-mono text-gold">{days}d {hours}h</span>.</p>
+            <p className="mt-1 text-sm text-muted">La creación de contenido está en pausa.</p>
+            <button onClick={stop} className="btn-ghost mt-3 text-sm">Terminar antes</button>
+          </>
+        ) : (
+          <>
+            <p className="text-cream">Pausa la creación de contenido y enfócate en leer.</p>
+            <p className="mt-1 text-sm text-muted">Solo Libros, Leer, Citas y Escribir quedan disponibles.</p>
+            <div className="mt-3 flex gap-2">
+              {[1, 3, 7].map((d) => (
+                <button key={d} onClick={() => start(d)} className="btn-ghost text-sm">{d} día{d > 1 ? "s" : ""}</button>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

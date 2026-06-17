@@ -140,6 +140,36 @@ Devuelve SOLO este JSON:
   }
 });
 
+/* ---------- G12 · Métricas poéticas ---------- */
+interface Poetics {
+  sabor: string;
+  ritmo: string;
+  densidad: string;
+  sugerencias: string[];
+}
+creativeRouter.post("/poetics", async (req: Request, res: Response) => {
+  const text = String(req.body?.text ?? "").trim();
+  if (!text) return res.status(400).json({ error: "Escribe algo antes de analizar." });
+  const systemPrompt =
+    "Eres un crítico de estilo literario, fino y honesto. Analizas la prosa. Devuelves solo JSON válido.";
+  const userPrompt = `Analiza el estilo de este texto:
+"""${text}"""
+
+Devuelve SOLO:
+{
+  "sabor": "a qué autor/estilo sabe (ej: borgesiano, pessoano, hemingwayano…) y por qué, en 1 frase",
+  "ritmo": "1 frase sobre el ritmo (frases largas/cortas, musicalidad)",
+  "densidad": "1 frase sobre densidad lírica (metáforas, adjetivación)",
+  "sugerencias": ["2-3 sugerencias concretas para mejorar"]
+}`;
+  try {
+    const r = await grokJson<Poetics>(systemPrompt, userPrompt);
+    return res.json(r);
+  } catch (err) {
+    return sendGrokError(res, err);
+  }
+});
+
 /* ---------- G17 · Modo debate ---------- */
 interface DebateStart {
   debatientes: Array<{ name: string; postura: string; apertura: string }>;

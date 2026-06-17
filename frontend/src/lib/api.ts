@@ -895,6 +895,13 @@ export const api = {
   deleteInfluence: (id: number) => request<{ ok: boolean }>(`/api/influences/${id}`, { method: "DELETE" }),
   expandInfluence: (id: number) => request<InflNode[]>(`/api/influences/${id}/expand`, { method: "POST" }),
 
+  // --- Métricas poéticas (G12) ---
+  poetics: (text: string) =>
+    request<{ sabor: string; ritmo: string; densidad: string; sugerencias: string[] }>(
+      "/api/creative/poetics",
+      { method: "POST", body: JSON.stringify({ text }) }
+    ),
+
   // --- Debate (G17) ---
   debateStart: (thesis: string) =>
     request<{ debatientes: Array<{ name: string; postura: string; apertura: string }> }>(
