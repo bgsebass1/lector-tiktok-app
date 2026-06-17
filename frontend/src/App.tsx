@@ -50,6 +50,10 @@ import PalabraInmersiva from "./pages/PalabraInmersiva";
 import CadaverExquisito from "./pages/CadaverExquisito";
 import DialogosCruce from "./pages/DialogosCruce";
 import Voz from "./pages/Voz";
+import MapaEmocional from "./pages/MapaEmocional";
+import Influencias from "./pages/Influencias";
+import Estante from "./pages/Estante";
+import NichoMap from "./pages/NichoMap";
 import Stub from "./pages/Stub";
 
 /** Rutas para los atajos Cmd+1..6. */
@@ -134,6 +138,10 @@ export default function App() {
               <Route path="/cadaver-exquisito" element={<CadaverExquisito />} />
               <Route path="/dialogos/cruce" element={<DialogosCruce />} />
               <Route path="/voz" element={<Voz />} />
+              <Route path="/mapa-emocional" element={<MapaEmocional />} />
+              <Route path="/influencias" element={<Influencias />} />
+              <Route path="/estante" element={<Estante />} />
+              <Route path="/nicho-map" element={<NichoMap />} />
               <Route path="/escribir" element={<Escribir />} />
               <Route path="/escribir/:id" element={<EscribirEditor />} />
               <Route path="/recursos" element={<Recursos />} />

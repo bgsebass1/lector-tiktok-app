@@ -33,6 +33,8 @@ import { shuffleRouter } from "./routes/shuffle.js";
 import { notesRouter } from "./routes/notes.js";
 import { oracleRouter } from "./routes/oracle.js";
 import { creativeRouter } from "./routes/creative.js";
+import { emotionMapRouter } from "./routes/emotionmap.js";
+import { influencesRouter } from "./routes/influences.js";
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 3001);
@@ -77,6 +79,8 @@ app.use("/api/shuffle", shuffleRouter);
 app.use("/api/notes", notesRouter);
 app.use("/api/oracle", oracleRouter);
 app.use("/api/creative", creativeRouter);
+app.use("/api/emotionmap", emotionMapRouter);
+app.use("/api/influences", influencesRouter);
 
 
 app.listen(PORT, () => {

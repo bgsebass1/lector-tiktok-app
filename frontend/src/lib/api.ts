@@ -415,6 +415,29 @@ export interface MoodResult {
   radio: string;
 }
 
+/* ---------- Parte G — Fase G3 ---------- */
+
+export interface EmotionBook {
+  id: number;
+  title: string;
+  author: string;
+  year: number | null;
+  rating: number | null;
+  cover_url: string | null;
+  x: number;
+  y: number;
+  placed: number; // 0/1
+}
+
+export interface InflNode {
+  id: number;
+  name: string;
+  parent_id: number | null;
+  note: string | null;
+  key_works: string | null;
+  created_at: string;
+}
+
 /* ---------- Banco de ideas ---------- */
 
 export interface Note {
@@ -859,6 +882,22 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ aId, bId, topic, transcript, speaker }),
     }),
+
+  // --- Mapa emocional (G3) ---
+  emotionMap: () => request<EmotionBook[]>("/api/emotionmap"),
+  setBookMood: (bookId: number, x: number, y: number) =>
+    request<{ ok: boolean }>(`/api/emotionmap/${bookId}`, { method: "PUT", body: JSON.stringify({ x, y }) }),
+
+  // --- Árbol de influencias (G5) ---
+  listInfluences: () => request<InflNode[]>("/api/influences"),
+  addInfluence: (data: { name: string; parent_id?: number | null; note?: string; key_works?: string }) =>
+    request<InflNode>("/api/influences", { method: "POST", body: JSON.stringify(data) }),
+  deleteInfluence: (id: number) => request<{ ok: boolean }>(`/api/influences/${id}`, { method: "DELETE" }),
+  expandInfluence: (id: number) => request<InflNode[]>(`/api/influences/${id}/expand`, { method: "POST" }),
+
+  // --- Nicho map (G18) ---
+  nichoNext: (nicho: string) =>
+    request<{ text: string }>("/api/creative/nicho-next", { method: "POST", body: JSON.stringify({ nicho }) }),
 
   // --- Banco de ideas ---
   listNotes: (category?: string) =>

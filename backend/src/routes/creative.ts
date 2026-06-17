@@ -140,6 +140,22 @@ Devuelve SOLO este JSON:
   }
 });
 
+/* ---------- G18 · Próximo paso de nicho ---------- */
+creativeRouter.post("/nicho-next", async (req: Request, res: Response) => {
+  const nicho = String(req.body?.nicho ?? "").trim();
+  const systemPrompt =
+    CHANNEL_CONTEXT +
+    " Aconsejas cómo expandir un canal de contenido sin perder identidad. Respondes breve y concreto.";
+  const userPrompt = `Mi canal es de filosofía/literatura/historia del lenguaje. Estoy mirando el nicho "${nicho}". ` +
+    `Dame en 2-3 frases mi próximo paso concreto para explorar ese nicho sin perder mi identidad.`;
+  try {
+    const text = await grokText(systemPrompt, userPrompt);
+    return res.json({ text });
+  } catch (err) {
+    return sendGrokError(res, err);
+  }
+});
+
 /* ---------- G7 · Cita literaria de una palabra ---------- */
 creativeRouter.post("/word-quote", async (req: Request, res: Response) => {
   const word = String(req.body?.word ?? "").trim();

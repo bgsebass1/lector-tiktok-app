@@ -301,6 +301,24 @@ export function initDb(): void {
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
 
+    /* ---- Módulo: Mapa emocional de lecturas (G3) ---- */
+    CREATE TABLE IF NOT EXISTS book_moods (
+      book_id INTEGER PRIMARY KEY,
+      x REAL NOT NULL DEFAULT 0,
+      y REAL NOT NULL DEFAULT 0,
+      FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE
+    );
+
+    /* ---- Módulo: Árbol de influencias (G5) ---- */
+    CREATE TABLE IF NOT EXISTS influences (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      parent_id INTEGER,
+      note TEXT,
+      key_works TEXT,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+
     /* ---- Módulo: El Oráculo literario (G1) ---- */
     CREATE TABLE IF NOT EXISTS oracle_consultations (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
