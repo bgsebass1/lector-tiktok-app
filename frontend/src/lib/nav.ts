@@ -24,12 +24,16 @@ export const drawerSections: NavSection[] = [
       { label: "Diálogos", to: "/dialogos", icon: "💭" },
       { label: "Flashcards", to: "/flashcards", icon: "🗂️" },
       { label: "Timeline", to: "/timeline", icon: "🧭" },
+      { label: "Palabra del día", to: "/palabra", icon: "🔡" },
     ],
   },
   {
     title: "Tu contenido",
     items: [
       { label: "Banco de ideas", to: "/banco", icon: "🧠" },
+      { label: "Oráculo", to: "/oraculo", icon: "🔮" },
+      { label: "Mood reading", to: "/mood", icon: "🎭" },
+      { label: "Recetario de hooks", to: "/recetario", icon: "🪝" },
       { label: "Inspiración", to: "/inspiracion", icon: "💡" },
       { label: "Modo monje", to: "/monje", icon: "🧘" },
       { label: "Shuffle creativo", to: "/shuffle", icon: "🎲" },

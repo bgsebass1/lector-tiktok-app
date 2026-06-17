@@ -301,6 +301,16 @@ export function initDb(): void {
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
 
+    /* ---- Módulo: El Oráculo literario (G1) ---- */
+    CREATE TABLE IF NOT EXISTS oracle_consultations (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      question TEXT NOT NULL,
+      quote_text TEXT NOT NULL,
+      quote_author TEXT,
+      interpretation TEXT NOT NULL,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+
     /* ---- Módulo: Banco de ideas (notas categorizadas + IA) ---- */
     CREATE TABLE IF NOT EXISTS notes (
       id INTEGER PRIMARY KEY AUTOINCREMENT,

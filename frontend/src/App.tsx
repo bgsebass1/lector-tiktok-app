@@ -43,6 +43,10 @@ import Backup from "./pages/Backup";
 import Atajos from "./pages/Atajos";
 import Coleccion from "./pages/Coleccion";
 import Banco from "./pages/Banco";
+import Oraculo from "./pages/Oraculo";
+import Mood from "./pages/Mood";
+import Recetario from "./pages/Recetario";
+import PalabraInmersiva from "./pages/PalabraInmersiva";
 import Stub from "./pages/Stub";
 
 /** Rutas para los atajos Cmd+1..6. */
@@ -120,6 +124,10 @@ export default function App() {
               <Route path="/monje" element={<Monje />} />
               <Route path="/shuffle" element={<Shuffle />} />
               <Route path="/banco" element={<Banco />} />
+              <Route path="/oraculo" element={<Oraculo />} />
+              <Route path="/mood" element={<Mood />} />
+              <Route path="/recetario" element={<Recetario />} />
+              <Route path="/palabra" element={<PalabraInmersiva />} />
               <Route path="/escribir" element={<Escribir />} />
               <Route path="/escribir/:id" element={<EscribirEditor />} />
               <Route path="/recursos" element={<Recursos />} />

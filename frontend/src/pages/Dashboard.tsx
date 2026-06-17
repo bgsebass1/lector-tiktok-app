@@ -78,6 +78,10 @@ export default function Dashboard() {
           {greeting()}, Sebastian <span className="text-gold">😁</span>
         </h1>
         <p className="mt-2 font-serif text-xl text-muted">¿Qué vamos a crear hoy?</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Link to="/mood" className="rounded-full border border-border px-3 py-1.5 text-sm text-cream transition hover:border-gold">🎭 Hoy me siento…</Link>
+          <Link to="/oraculo" className="rounded-full border border-border px-3 py-1.5 text-sm text-cream transition hover:border-gold">🔮 Consultar al oráculo</Link>
+        </div>
         {todayIntention && (
           <p className="mt-3 inline-block rounded-lg border border-gold/30 bg-gold/5 px-3 py-1.5 text-sm text-gold">
             ✦ Intención de hoy: <span className="text-cream">{todayIntention}</span>

@@ -396,6 +396,25 @@ export interface Highlight {
   created_at: string;
 }
 
+/* ---------- Parte G — Fase G1 ---------- */
+
+export interface OracleConsultation {
+  id: number;
+  question: string;
+  quote_text: string;
+  quote_author: string | null;
+  interpretation: string;
+  created_at: string;
+}
+
+export interface MoodResult {
+  retomar: { title: string; author: string; reason: string };
+  descubrir: { title: string; author: string; reason: string };
+  cita: { text: string; author: string };
+  video: string;
+  radio: string;
+}
+
 /* ---------- Banco de ideas ---------- */
 
 export interface Note {
@@ -807,6 +826,23 @@ export const api = {
 
   // --- Transversal: búsqueda global ---
   search: (q: string) => request<SearchResult[]>(`/api/search?q=${encodeURIComponent(q)}`),
+
+  // --- Oráculo (G1) ---
+  oracleConsult: (question: string) =>
+    request<OracleConsultation>("/api/oracle/consult", { method: "POST", body: JSON.stringify({ question }) }),
+  listOracle: () => request<OracleConsultation[]>("/api/oracle"),
+  deleteOracle: (id: number) => request<{ ok: boolean }>(`/api/oracle/${id}`, { method: "DELETE" }),
+
+  // --- Mood reading (G13) ---
+  mood: (mood: string) => request<MoodResult>("/api/creative/mood", { method: "POST", body: JSON.stringify({ mood }) }),
+
+  // --- Recetario de hooks (G15) ---
+  adaptHook: (formula: string, topic: string) =>
+    request<{ text: string }>("/api/creative/hook", { method: "POST", body: JSON.stringify({ formula, topic }) }),
+
+  // --- Palabra inmersiva (G7) ---
+  wordQuote: (word: string) =>
+    request<{ text: string }>("/api/creative/word-quote", { method: "POST", body: JSON.stringify({ word }) }),
 
   // --- Banco de ideas ---
   listNotes: (category?: string) =>
