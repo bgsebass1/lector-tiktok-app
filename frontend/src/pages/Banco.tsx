@@ -182,8 +182,28 @@ function NoteModal({ note, onClose, onChange }: { note: Note | null; onClose: ()
           ))}
         </div>
 
-        <input className={`input border-l-4 ${c.border}`} placeholder="Título" value={title} onChange={(e) => setTitle(e.target.value)} />
-        <textarea className="input mt-3 min-h-[140px] resize-y font-serif" placeholder="Escribe tu idea con todo el detalle que quieras…" value={content} onChange={(e) => setContent(e.target.value)} />
+        <input
+          className={`w-full border-l-4 bg-transparent px-3 py-2 font-display text-2xl text-cream placeholder:text-muted focus:outline-none ${c.border}`}
+          placeholder="Título"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        {/* Hoja de cuaderno: renglones + serif para leer/escribir bonito. */}
+        <textarea
+          className="mt-2 block w-full min-h-[300px] resize-y rounded-lg border border-border px-4 font-serif text-lg text-cream placeholder:text-muted focus:border-gold focus:outline-none"
+          style={{
+            lineHeight: "32px",
+            paddingTop: "6px",
+            paddingBottom: "8px",
+            backgroundColor: "rgb(var(--surface))",
+            backgroundImage:
+              "repeating-linear-gradient(transparent, transparent 31px, rgb(var(--border) / 0.6) 31px, rgb(var(--border) / 0.6) 32px)",
+            backgroundAttachment: "local",
+          }}
+          placeholder="Escribe tu idea con todo el detalle que quieras…"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+        />
 
         <div className="mt-3 flex flex-wrap gap-2">
           <button onClick={save} disabled={!!busy} className="btn-gold">{busy === "save" ? "Guardando…" : "Guardar"}</button>
