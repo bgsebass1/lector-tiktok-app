@@ -301,6 +301,20 @@ export function initDb(): void {
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
 
+    /* ---- Módulo: Taller de escritura de 60 días ---- */
+    CREATE TABLE IF NOT EXISTS course_days (
+      day INTEGER PRIMARY KEY,
+      theory TEXT,
+      exercise TEXT,
+      criteria TEXT,          -- checklist de autoevaluación (JSON array)
+      user_text TEXT,
+      score REAL,             -- promedio de las 5 destrezas
+      score_detail TEXT,      -- {claridad, observacion, originalidad, profundidad, estilo} (JSON)
+      score_reason TEXT,      -- veredicto + fuerte + mejora (JSON)
+      generated_at TEXT,
+      updated_at TEXT
+    );
+
     /* ---- Módulo: Mapa emocional de lecturas (G3) ---- */
     CREATE TABLE IF NOT EXISTS book_moods (
       book_id INTEGER PRIMARY KEY,

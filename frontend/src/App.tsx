@@ -14,6 +14,8 @@ import Radio from "./pages/Radio";
 import Antologia from "./pages/Antologia";
 import Wrapped from "./pages/Wrapped";
 import Debate from "./pages/Debate";
+import Taller from "./pages/Taller";
+import TallerDia from "./pages/TallerDia";
 import DetoxBlock from "./components/DetoxBlock";
 import { isDetox, isBlocked, detoxUntil, endDetox } from "./lib/detox";
 import { notifyOk } from "./lib/notify";
@@ -167,6 +169,8 @@ export default function App() {
               <Route path="/antologia" element={<Antologia />} />
               <Route path="/wrapped" element={<Wrapped />} />
               <Route path="/debate" element={<Debate />} />
+              <Route path="/taller" element={<Taller />} />
+              <Route path="/taller/:day" element={<TallerDia />} />
               <Route path="/escribir" element={<Escribir />} />
               <Route path="/escribir/:id" element={<EscribirEditor />} />
               <Route path="/recursos" element={<Recursos />} />

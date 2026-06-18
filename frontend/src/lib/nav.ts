@@ -50,6 +50,7 @@ export const drawerSections: NavSection[] = [
       { label: "Shuffle creativo", to: "/shuffle", icon: "🎲" },
       { label: "Constelación", to: "/constelacion", icon: "🕸️" },
       { label: "Escribir", to: "/escribir", icon: "✒️" },
+      { label: "Taller de escritura", to: "/taller", icon: "🎓" },
       { label: "Recursos B-roll", to: "/recursos", icon: "🎬" },
       { label: "Analytics TikTok", to: "/tiktok", icon: "📊" },
     ],

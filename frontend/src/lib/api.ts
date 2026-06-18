@@ -438,6 +438,38 @@ export interface InflNode {
   created_at: string;
 }
 
+/* ---------- Taller de escritura (60 días) ---------- */
+
+export interface CourseDayMeta {
+  day: number;
+  week: number;
+  weekTitle: string;
+  title: string;
+  brief: string;
+  skills: string[];
+  project?: boolean;
+  generated: boolean;
+  done: boolean;
+  score: number | null;
+}
+export interface CourseOverview {
+  days: CourseDayMeta[];
+  weekTitles: Record<number, string>;
+  done: number;
+  current: number;
+  total: number;
+}
+export interface CourseDayFull {
+  meta: { day: number; week: number; weekTitle: string; title: string; brief: string; skills: string[]; project?: boolean };
+  theory: string | null;
+  exercise: string | null;
+  criteria: string[] | null;
+  user_text: string;
+  score: number | null;
+  score_detail: Record<string, number> | null;
+  score_reason: { veredicto: string; fuerte: string; mejora: string } | null;
+}
+
 /* ---------- Banco de ideas ---------- */
 
 export interface Note {
@@ -914,6 +946,22 @@ export const api = {
   // --- Nicho map (G18) ---
   nichoNext: (nicho: string) =>
     request<{ text: string }>("/api/creative/nicho-next", { method: "POST", body: JSON.stringify({ nicho }) }),
+
+  // --- Taller de escritura ---
+  courseOverview: () => request<CourseOverview>("/api/course"),
+  courseDay: (day: number) => request<CourseDayFull>(`/api/course/${day}`),
+  courseGenerate: (day: number, feedback?: string) =>
+    request<{ theory: string; exercise: string; criteria: string[] }>(`/api/course/${day}/generate`, {
+      method: "POST",
+      body: JSON.stringify({ feedback: feedback ?? "" }),
+    }),
+  courseSaveText: (day: number, text: string) =>
+    request<{ ok: boolean }>(`/api/course/${day}/text`, { method: "POST", body: JSON.stringify({ text }) }),
+  courseEvaluate: (day: number) =>
+    request<{ score: number; score_detail: Record<string, number>; score_reason: { veredicto: string; fuerte: string; mejora: string } }>(
+      `/api/course/${day}/evaluate`,
+      { method: "POST" }
+    ),
 
   // --- Banco de ideas ---
   listNotes: (category?: string) =>
