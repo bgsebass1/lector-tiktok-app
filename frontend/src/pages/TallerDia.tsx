@@ -22,9 +22,11 @@ export default function TallerDia() {
   const [data, setData] = useState<CourseDayFull | null>(null);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
+  const [err, setErr] = useState(false);
 
   function load() {
-    api.courseDay(d).then((r) => { setData(r); setText(r.user_text || ""); }).catch(() => {});
+    setErr(false);
+    api.courseDay(d).then((r) => { setData(r); setText(r.user_text || ""); }).catch(() => setErr(true));
   }
   useEffect(load, [d]);
 
@@ -57,7 +59,16 @@ export default function TallerDia() {
     if (fb && fb.trim()) generate(fb.trim());
   }
 
-  if (!data) return null;
+  if (err) {
+    return (
+      <div className="mx-auto max-w-md py-16 text-center">
+        <p className="text-muted">No se pudo cargar este día. Revisa tu conexión.</p>
+        <button onClick={load} className="btn-gold mt-4">Reintentar</button>
+        <button onClick={() => navigate("/taller")} className="btn-ghost mt-3 block w-full">← Volver al taller</button>
+      </div>
+    );
+  }
+  if (!data) return <p className="py-16 text-center text-muted">Cargando…</p>;
   const m = data.meta;
 
   return (

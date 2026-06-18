@@ -7,7 +7,7 @@
  *   - Carátulas de Open Library-> stale-while-revalidate.
  *   - Resto de assets propios  -> cache-first.
  */
-const VERSION = "pliego-v1";
+const VERSION = "pliego-v2";
 const STATIC = `static-${VERSION}`;
 const API = `api-${VERSION}`;
 const COVERS = `covers-${VERSION}`;

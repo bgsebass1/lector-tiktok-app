@@ -5,11 +5,24 @@ import { api, type CourseOverview } from "../lib/api";
 /** TALLER DE ESCRITURA — 60 días (overview). */
 export default function Taller() {
   const [data, setData] = useState<CourseOverview | null>(null);
+  const [err, setErr] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => { api.courseOverview().then(setData).catch(() => {}); }, []);
+  function load() {
+    setErr(false);
+    api.courseOverview().then(setData).catch(() => setErr(true));
+  }
+  useEffect(load, []);
 
-  if (!data) return null;
+  if (err) {
+    return (
+      <div className="mx-auto max-w-md py-16 text-center">
+        <p className="text-muted">No se pudo cargar el taller. Revisa tu conexión.</p>
+        <button onClick={load} className="btn-gold mt-4">Reintentar</button>
+      </div>
+    );
+  }
+  if (!data) return <p className="py-16 text-center text-muted">Cargando el taller…</p>;
 
   // Agrupar por semana.
   const weeks: Record<number, typeof data.days> = {};
