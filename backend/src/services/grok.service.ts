@@ -12,8 +12,51 @@
  */
 import { GROK_CONFIG } from "../config/grok.config.js";
 
-/** Endpoint de chat completions (formato OpenAI). */
-const GROK_URL = `${GROK_CONFIG.BASE_URL}/chat/completions`;
+/** Un proveedor de IA al que intentar (formato OpenAI Chat Completions). */
+interface Provider {
+  baseUrl: string;
+  apiKey: string;
+  model: string;
+  label: string;
+}
+
+/**
+ * Lista de proveedores en orden de intento (failover).
+ *  1. El principal (GROK_BASE_URL/KEY/MODEL).
+ *  2. Un modelo de respaldo en la MISMA clave (otra cuota diaria en Groq, gratis).
+ *  3. Un proveedor secundario completo, si se configura (GROK_*_2).
+ */
+function providers(): Provider[] {
+  const list: Provider[] = [];
+  const baseUrl = GROK_CONFIG.BASE_URL;
+  const key = process.env.GROK_API_KEY;
+  if (key && key !== "tu_api_key_aqui") {
+    list.push({ baseUrl, apiKey: key, model: GROK_CONFIG.MODEL, label: `principal (${GROK_CONFIG.MODEL})` });
+    // Modelo de respaldo en la misma clave: en Groq el límite es POR modelo,
+    // así que esto da capacidad extra sin configurar nada.
+    const fb = process.env.GROK_MODEL_FALLBACK || "llama-3.1-8b-instant";
+    if (fb && fb !== GROK_CONFIG.MODEL) {
+      list.push({ baseUrl, apiKey: key, model: fb, label: `respaldo (${fb})` });
+    }
+  }
+  // Proveedor secundario completo (otra clave / otro proveedor), opcional.
+  const key2 = process.env.GROK_API_KEY_2;
+  if (key2) {
+    list.push({
+      baseUrl: process.env.GROK_BASE_URL_2 || baseUrl,
+      apiKey: key2,
+      model: process.env.GROK_MODEL_2 || GROK_CONFIG.MODEL,
+      label: "secundario",
+    });
+  }
+  return list;
+}
+
+/** ¿Conviene reintentar con el siguiente proveedor ante este error? */
+function isRetryable(status: number): boolean {
+  // 429 sin cupo · 401/403 auth · 404 modelo retirado/no encontrado · 5xx servidor.
+  return status === 429 || status === 401 || status === 403 || status === 404 || status >= 500;
+}
 
 /**
  * Error específico de Grok que conserva el código HTTP y el código/mensaje
@@ -78,33 +121,23 @@ function parseGrokError(raw: string): { code: string | null; message: string } {
  * - Si la API responde con error, NO lo esconde: parsea el JSON y lanza un
  *   GrokError con el status HTTP + código + mensaje exactos.
  */
-async function callGrok(systemPrompt: string, userPrompt: string): Promise<string> {
-  const apiKey = process.env.GROK_API_KEY;
-  if (!apiKey || apiKey === "tu_api_key_aqui") {
-    throw new GrokError(
-      "Falta GROK_API_KEY. Crea el archivo backend/.env con tu clave de xAI.",
-      500,
-      "missing_api_key"
-    );
-  }
-
-  // Timeout: abortamos la petición si tarda demasiado.
+/** Un solo intento contra un proveedor concreto. Lanza GrokError si falla. */
+async function attempt(p: Provider, systemPrompt: string, userPrompt: string): Promise<string> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), GROK_CONFIG.TIMEOUT_MS);
 
   let res: Response;
   try {
-    res = await fetch(GROK_URL, {
+    res = await fetch(`${p.baseUrl}/chat/completions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-        // Cabeceras opcionales que OpenRouter recomienda (se ignoran en xAI directo).
+        Authorization: `Bearer ${p.apiKey}`,
         "HTTP-Referer": "http://localhost:5173",
-        "X-Title": "Libros nada más · Estudio",
+        "X-Title": "Pliego · Estudio",
       },
       body: JSON.stringify({
-        model: GROK_CONFIG.MODEL,
+        model: p.model,
         max_tokens: GROK_CONFIG.MAX_TOKENS,
         messages: [
           { role: "system", content: systemPrompt },
@@ -115,18 +148,11 @@ async function callGrok(systemPrompt: string, userPrompt: string): Promise<strin
       signal: controller.signal,
     });
   } catch (err) {
-    // Errores de red o timeout (abort).
     if (err instanceof Error && err.name === "AbortError") {
-      throw new GrokError(
-        `La petición a Grok superó el límite de ${GROK_CONFIG.TIMEOUT_MS / 1000}s.`,
-        504,
-        "timeout"
-      );
+      throw new GrokError(`La IA superó el límite de ${GROK_CONFIG.TIMEOUT_MS / 1000}s.`, 504, "timeout");
     }
     throw new GrokError(
-      `No se pudo conectar con la API de Grok: ${
-        err instanceof Error ? err.message : String(err)
-      }`,
+      `No se pudo conectar con la IA: ${err instanceof Error ? err.message : String(err)}`,
       502,
       "network_error"
     );
@@ -137,19 +163,47 @@ async function callGrok(systemPrompt: string, userPrompt: string): Promise<strin
   if (!res.ok) {
     const raw = await res.text();
     const { code, message } = parseGrokError(raw);
-    // Log en el servidor para depurar, y error estructurado hacia la UI.
-    console.error(
-      `❌ Grok ${res.status} (modelo "${GROK_CONFIG.MODEL}") code=${code ?? "?"}: ${message}`
-    );
+    console.error(`❌ IA ${res.status} (${p.label}) code=${code ?? "?"}: ${message}`);
     throw new GrokError(message, res.status, code);
   }
 
   const data = (await res.json()) as ChatCompletionResponse;
   const content = data.choices?.[0]?.message?.content;
-  if (!content) {
-    throw new GrokError("Grok no devolvió contenido.", 502, "empty_response");
-  }
+  if (!content) throw new GrokError("La IA no devolvió contenido.", 502, "empty_response");
   return content;
+}
+
+/**
+ * Llama a la IA con failover: prueba cada proveedor en orden y, si uno falla
+ * por un motivo reintentable (429 sin cupo, 401/403, 5xx, red, timeout),
+ * pasa al siguiente. Si todos fallan, lanza el último GrokError.
+ */
+async function callGrok(systemPrompt: string, userPrompt: string): Promise<string> {
+  const list = providers();
+  if (list.length === 0) {
+    throw new GrokError(
+      "Falta GROK_API_KEY. Configura la clave de IA en backend/.env.",
+      500,
+      "missing_api_key"
+    );
+  }
+
+  let lastError: GrokError | null = null;
+  for (let i = 0; i < list.length; i++) {
+    try {
+      return await attempt(list[i], systemPrompt, userPrompt);
+    } catch (err) {
+      const e = err instanceof GrokError ? err : new GrokError(String(err), 500, "unknown");
+      lastError = e;
+      const hayMas = i < list.length - 1;
+      if (hayMas && isRetryable(e.status)) {
+        console.warn(`↪️ Failover: "${list[i].label}" falló (${e.status}); probando el siguiente…`);
+        continue;
+      }
+      throw e;
+    }
+  }
+  throw lastError ?? new GrokError("Sin proveedores de IA disponibles.", 500, "no_providers");
 }
 
 /**
