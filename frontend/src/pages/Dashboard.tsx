@@ -10,6 +10,22 @@ import {
 } from "../lib/api";
 import CountUp from "../components/CountUp";
 
+/** Accesos rápidos a los módulos (sección "Explora Pliego"). */
+const EXPLORE: Array<{ icon: string; label: string; desc: string; to: string }> = [
+  { icon: "🎓", label: "Taller de escritura", desc: "60 días con IA", to: "/taller" },
+  { icon: "🧠", label: "Banco de ideas", desc: "Captura y califica", to: "/banco" },
+  { icon: "📖", label: "Leer", desc: "Cronómetro y notas", to: "/leer" },
+  { icon: "🔖", label: "Quiero leer", desc: "Tu próxima lectura", to: "/quiero-leer" },
+  { icon: "💭", label: "Diálogos", desc: "Habla con autores", to: "/dialogos" },
+  { icon: "⚔️", label: "Cruce de autores", desc: "Debate entre mentes", to: "/dialogos/cruce" },
+  { icon: "🃏", label: "Flashcards", desc: "Repaso espaciado", to: "/flashcards" },
+  { icon: "🕸️", label: "Constelación", desc: "Tus libros conectados", to: "/constelacion" },
+  { icon: "🗺️", label: "Mapa emocional", desc: "Lecturas por emoción", to: "/mapa-emocional" },
+  { icon: "🎙️", label: "Estudio de voz", desc: "Teleprompter + grabar", to: "/voz" },
+  { icon: "📻", label: "Radio Pliego", desc: "Atmósfera para leer", to: "/radio" },
+  { icon: "🧘", label: "Modo monje", desc: "Concentración total", to: "/monje" },
+];
+
 /**
  * DASHBOARD PRINCIPAL (Módulo 11).
  * Resumen tipo "home" con widgets: saludo, próximos videos, ideas frescas,
@@ -179,6 +195,22 @@ export default function Dashboard() {
           <p className="mt-3 font-mono text-xs text-muted">Tip: ⌘K para buscar · ⌘N para crear</p>
         </Widget>
       </div>
+
+      {/* Explora Pliego — accesos a los módulos */}
+      <section className="mt-10">
+        <h2 className="mb-3 font-display text-2xl text-cream">Explora Pliego</h2>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          {EXPLORE.map((e) => (
+            <Link key={e.to} to={e.to} className="card flex items-center gap-3 p-3 transition hover:border-gold">
+              <span className="text-2xl">{e.icon}</span>
+              <span className="min-w-0">
+                <span className="block truncate text-sm text-cream">{e.label}</span>
+                <span className="block truncate text-xs text-muted">{e.desc}</span>
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
